@@ -45,25 +45,26 @@
   /* --------------------------------------------------------- catálogos */
   const CATS = {
     // paleta contida: cores da marca + neutros quentes
-    alimentacao: { name: 'Alimentação', emoji: '🍔', color: '#D4553A', group: 'want' },
-    mercado: { name: 'Mercado', emoji: '🛒', color: '#6FA898', group: 'need' },
-    transporte: { name: 'Transporte', emoji: '🚗', color: '#0B3D33', group: 'need' },
-    moradia: { name: 'Moradia', emoji: '🏠', color: '#3E5C76', group: 'need' },
-    contas: { name: 'Contas & serviços', emoji: '💡', color: '#8FA39C', group: 'need' },
-    saude: { name: 'Saúde', emoji: '💊', color: '#C98A5E', group: 'need' },
-    educacao: { name: 'Educação', emoji: '📚', color: '#B7A46A', group: 'need' },
-    compras: { name: 'Compras', emoji: '🛍️', color: '#E3A08C', group: 'want' },
-    lazer: { name: 'Lazer', emoji: '🎉', color: '#6C7A89', group: 'want' },
-    assinaturas: { name: 'Assinaturas', emoji: '📺', color: '#9C3B2A', group: 'want' },
-    viagem: { name: 'Viagem', emoji: '✈️', color: '#9DB7C9', group: 'want' },
-    pets: { name: 'Pets', emoji: '🐶', color: '#A58A6E', group: 'want' },
-    outros: { name: 'Outros', emoji: '📦', color: '#C3CCC9', group: 'want' },
-    salario: { name: 'Salário', emoji: '💰', color: '#3DBA85', income: true },
-    freela: { name: 'Freelas & extras', emoji: '💼', color: '#3DBA85', income: true },
-    rendimentos: { name: 'Rendimentos', emoji: '📈', color: '#3DBA85', income: true },
-    pixrecebido: { name: 'Pix recebido', emoji: '⚡', color: '#3DBA85', income: true },
-    caixinha: { name: 'Caixinhas', emoji: '🐷', color: '#3DBA85', system: true },
-    fatura: { name: 'Pagamento de fatura', emoji: '💳', color: '#3E5C76', system: true },
+    alimentacao: { name: 'Alimentação', color: '#D4553A', group: 'want' },
+    mercado: { name: 'Mercado', color: '#6FA898', group: 'need' },
+    transporte: { name: 'Transporte', color: '#0B3D33', group: 'need' },
+    moradia: { name: 'Moradia', color: '#3E5C76', group: 'need' },
+    contas: { name: 'Contas & serviços', color: '#8FA39C', group: 'need' },
+    saude: { name: 'Saúde', color: '#C98A5E', group: 'need' },
+    educacao: { name: 'Educação', color: '#B7A46A', group: 'need' },
+    compras: { name: 'Compras', color: '#E3A08C', group: 'want' },
+    lazer: { name: 'Lazer', color: '#6C7A89', group: 'want' },
+    assinaturas: { name: 'Assinaturas', color: '#9C3B2A', group: 'want' },
+    viagem: { name: 'Viagem', color: '#9DB7C9', group: 'want' },
+    pets: { name: 'Pets', color: '#A58A6E', group: 'want' },
+    outros: { name: 'Outros', color: '#C3CCC9', group: 'want' },
+    salario: { name: 'Salário', color: '#3DBA85', income: true },
+    freela: { name: 'Freelas & extras', color: '#3DBA85', income: true },
+    rendimentos: { name: 'Rendimentos', color: '#3DBA85', income: true },
+    pixrecebido: { name: 'Pix recebido', color: '#3DBA85', income: true },
+    outrasentradas: { name: 'Outras entradas', color: '#3DBA85', income: true },
+    caixinha: { name: 'Caixinhas', color: '#3DBA85', system: true },
+    fatura: { name: 'Pagamento de fatura', color: '#3E5C76', system: true },
   };
   // Variações de design (?v=black,icons,dark)
   const VARIANT = (new URLSearchParams(location.search).get('v') || '').split(',').join(' ');
@@ -82,6 +83,7 @@
     viagem: '<path d="M10.5 13.5L3 11l2-2 7 1 4.5-4.5a2 2 0 0 1 3 3L15 13l1 7-2 2-2.5-7.5L8 18v3l-1.5 1-1-4-4-1L3 15.5h3z"/>',
     pets: '<circle cx="6.5" cy="10" r="1.8"/><circle cx="10" cy="5.5" r="1.8"/><circle cx="14" cy="5.5" r="1.8"/><circle cx="17.5" cy="10" r="1.8"/><path d="M8 17c0-3 2-5 4-5s4 2 4 5-2 3-4 3-4 0-4-3z"/>',
     outros: '<path d="M3 7l9-4 9 4v10l-9 4-9-4zM3 7l9 4 9-4M12 11v10"/>',
+    outrasentradas: '<circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/>',
     salario: '<path d="M12 3v12M7 10l5 5 5-5M4 20h16"/>', freela: '<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M3 13h18"/>',
     rendimentos: '<path d="M3 17l6-6 4 4 8-8M15 7h6v6"/>', pixrecebido: '<path d="M12 3v12M7 10l5 5 5-5M4 20h16"/>',
     caixinha: '<ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6"/>',
@@ -97,11 +99,10 @@
     stop: '<path d="M8 3h8l5 5v8l-5 5H8l-5-5V8z"/><path d="M8 12h8"/>',
   });
   const svgI = (k, cls = 'cat-svg') => `<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${CAT_SVG[k] || CAT_SVG.outros}</svg>`;
-  const EMOJI_MODE = /\bemoji\b/.test(VARIANT); // ?v=emoji volta ao visual antigo
-  const catIco = (k) => (EMOJI_MODE ? (CATS[k] || CATS.outros).emoji : svgI(CATS[k] ? k : 'outros'));
-  const methodIco = (k) => (EMOJI_MODE ? (METHODS[k] || {}).ico || '' : svgI(k, 'cat-svg sm'));
+  const catIco = (k) => svgI(CATS[k] ? k : 'outros');
+  const methodIco = (k) => svgI(k, 'cat-svg sm');
   const UI_ICO = { '🥡': 'alimentacao', '🚕': 'transporte', '📺': 'assinaturas', '⚠️': 'alert', '🏆': 'trophy', '🛟': 'buoy', '🎯': 'target', '💳': 'fatura', '🏠': 'moradia', '📆': 'cal', '🐷': 'caixinha', '🛑': 'stop' };
-  const uiIco = (e) => (String(e).startsWith('cat:') ? catIco(e.slice(4)) : EMOJI_MODE || !UI_ICO[e] ? e : svgI(UI_ICO[e]));
+  const uiIco = (e, kind) => (String(e).startsWith('cat:') ? catIco(e.slice(4)) : svgI(UI_ICO[e] || (kind === 'alert' ? 'alert' : kind === 'good' ? 'trophy' : 'target')));
   const EXP_CATS = Object.keys(CATS).filter((k) => !CATS[k].income && !CATS[k].system);
   const INC_CATS = Object.keys(CATS).filter((k) => CATS[k].income);
   const cat = (k) => CATS[k] || CATS.outros;
@@ -138,9 +139,9 @@
   function autoCat(desc, amount, bankCategory) {
     const key = normDesc(desc);
     if (S && S.learned && S.learned[key]) return S.learned[key];
-    for (const [re, c] of RULES) if (re.test(desc)) return c;
+    for (const [re, c] of RULES) if (re.test(desc) && !!CATS[c].income === amount > 0) return c;
     if (bankCategory) for (const [re, c] of BANK_CAT_RULES) if (re.test(bankCategory) && !!CATS[c].income === amount > 0) return c;
-    return amount > 0 ? 'pixrecebido' : 'outros';
+    return amount > 0 ? (/pix/i.test(desc) ? 'pixrecebido' : 'outrasentradas') : 'outros';
   }
 
   const BANKS = {
@@ -157,8 +158,8 @@
     cash: { name: 'Dinheiro', color: '#2E7D32', short: 'R$' },
   };
   const METHODS = {
-    pix: { name: 'Pix', ico: '⚡' }, credito: { name: 'Crédito', ico: '💳' }, debito: { name: 'Débito', ico: '🏧' },
-    dinheiro: { name: 'Dinheiro', ico: '💵' }, boleto: { name: 'Boleto', ico: '🧾' }, ted: { name: 'Transferência', ico: '🔁' },
+    pix: { name: 'Pix' }, credito: { name: 'Crédito' }, debito: { name: 'Débito' },
+    dinheiro: { name: 'Dinheiro' }, boleto: { name: 'Boleto' }, ted: { name: 'Transferência' },
   };
 
   // Banco de uma conta/cartão: catálogo conhecido ou dados vindos do agregador (nome/cor)
@@ -317,12 +318,12 @@
       if (d.type === 'bank-sync' && fresh.length) {
         fresh.slice(0, 2).forEach((t) => {
           const bank = srcBank(t);
-          toast(`<b>${t.amount > 0 ? 'Entrada' : t.method === 'credito' ? 'Compra no crédito' : 'Novo gasto'}</b> · ${esc(bank.name)}<br>${esc(t.desc)} ${signed(t.amount)} → ${cat(t.cat).name}`, t.amount > 0 ? '💸' : '💳', 5500);
+          toast(`<b>${t.amount > 0 ? 'Entrada' : t.method === 'credito' ? 'Compra no crédito' : 'Novo gasto'}</b> · ${esc(bank.name)}<br>${esc(t.desc)} ${signed(t.amount)} ${cat(t.cat).name}`, t.amount > 0 ? '' : '', 5500);
           if (t.amount < 0) budgetCheck(t.cat);
         });
-        if (fresh.length > 2) toast(`+${fresh.length - 2} transações sincronizadas`, '🔄');
+        if (fresh.length > 2) toast(`+${fresh.length - 2} transações sincronizadas`);
       }
-      if (d.type === 'bank-error') toast('Um banco conectado pediu nova autorização. Veja em Contas & cartões.', '⚠️', 7000);
+      if (d.type === 'bank-error') toast('Um banco conectado pediu nova autorização. Veja em Contas & cartões.', 7000);
       const busy = document.activeElement && document.activeElement.closest && document.activeElement.closest('#view input, #view select');
       if (!busy && !$('#modalRoot').children.length) render();
     });
@@ -621,7 +622,7 @@
   /* ------------------------------------------------------- componentes */
   function txRow(t) {
     const c = cat(t.cat);
-    const m = METHODS[t.method] || { name: t.method, ico: '' };
+    const m = METHODS[t.method] || { name: t.method };
     const live = t.source === 'bank' || t.source === 'live' ? '<span class="tag">Open Finance</span>' : t.source === 'auto' ? '<span class="tag">Automático</span>' : '';
     return `<div class="tx ${UI.fresh.has(t.id) ? 'tx-new' : ''}" data-act="editTx" data-id="${t.id}" role="button" tabindex="0">
       <div class="tx-ico">${catIco(t.cat)}</div>
@@ -644,21 +645,21 @@
     const sim = simulate(g.target, g.saved, g.monthly, g.rate);
     const p = clamp(g.saved / g.target, 0, 1);
     const dark = ['#3E5C76', '#0B3D33', '#D4553A'].includes(g.color);
-    const eta = sim.months === 0 ? '🎉 Meta batida! Hora de resgatar ou criar a próxima.' : sim.months === Infinity ? 'Defina um aporte mensal para calcular a data.' : `Guardando <b>${brl0(g.monthly)}/mês</b>${g.rate ? ` a ${String(g.rate).replace('.', ',')}% a.a.` : ''}, você chega lá em <b>${monthsTxt(sim.months)}</b> (${monthYear(addMonths(sim.months))}).`;
+    const eta = sim.months === 0 ? 'Meta batida! Hora de resgatar ou criar a próxima.' : sim.months === Infinity ? 'Defina um aporte mensal para calcular a data.' : `Guardando <b>${brl0(g.monthly)}/mês</b>${g.rate ? ` a ${String(g.rate).replace('.', ',')}% a.a.` : ''}, você chega lá em <b>${monthsTxt(sim.months)}</b> (${monthYear(addMonths(sim.months))}).`;
     return `<article class="goal">
       <div class="goal-top" style="background:${g.color};color:${dark ? '#fff' : '#0B3D33'}">
-        <span class="emoji">${g.emoji}</span><h4>${esc(g.name)}</h4>
+        <span class="emoji">${svgI('caixinha')}</span><h4>${esc(g.name)}</h4>
         <span class="pill pct">${Math.round(p * 100)}%</span>
       </div>
       <div class="goal-body">
         <div class="nums"><b>${brl(g.saved)}</b><span class="muted" style="font-size:.82rem">de ${brl0(g.target)}</span></div>
         <div class="progress"><i style="width:${p * 100}%"></i></div>
-        <div class="goal-eta">${eta}${g.autoDay ? `<br><span class="muted">🔁 Aporte automático todo dia ${g.autoDay}</span>` : ''}</div>
+        <div class="goal-eta">${eta}${g.autoDay ? `<br><span class="muted">Aporte automático todo dia ${g.autoDay}</span>` : ''}</div>
         <div class="goal-actions">
           <button class="btn btn-lime btn-sm" data-act="goalMove" data-id="${g.id}" data-dir="1">+ Guardar</button>
           <button class="btn btn-sm" data-act="goalMove" data-id="${g.id}" data-dir="-1">Resgatar</button>
           <button class="btn btn-sm btn-ghost" data-act="simGoal" data-id="${g.id}">Simular</button>
-          <button class="btn btn-sm btn-ghost" data-act="editGoal" data-id="${g.id}" aria-label="Editar">✏️</button>
+          <button class="btn btn-sm btn-ghost" data-act="editGoal" data-id="${g.id}" aria-label="Editar"></button>
         </div>
       </div></article>`;
   }
@@ -724,7 +725,7 @@
         </div>
         <div class="row">
           <div>Metas do Finaxis<b>${brl0(goals)}</b></div>
-          <div>Investimentos bancÃ¡rios<b>${brl0(invested)}</b></div>
+          <div>Investimentos bancários<b>${brl0(invested)}</b></div>
           <div>Faturas em aberto<b>${brl0(inv)}</b></div>
           <div>Patrimônio líquido<b>${brl0(bal + goals + invested - inv)}</b></div>
         </div>
@@ -762,17 +763,17 @@
       </section>
       <section class="card">
         <div class="card-head"><h3>Caixinhas</h3><button class="link" data-go="caixinhas">Ver todas</button></div>
-        ${S.goals.length ? S.goals.slice(0, 4).map((g) => { const p = clamp(g.saved / g.target, 0, 1); const sim = simulate(g.target, g.saved, g.monthly, g.rate); return `<div class="budget-row"><div class="top"><b>${g.emoji} ${esc(g.name)}</b><span class="vals">${pct(p)}</span></div><div class="progress"><i style="width:${p * 100}%;background:${g.color}"></i></div><div class="muted" style="font-size:.74rem;margin-top:6px">${brl0(g.saved)} de ${brl0(g.target)} · ${sim.months === 0 ? 'concluída' : 'faltam ' + monthsTxt(sim.months)}</div></div>`; }).join('') : emptyBox('Crie sua primeira caixinha.', '<button class="btn btn-lime btn-sm" data-act="newGoal">Criar caixinha</button>')}
+        ${S.goals.length ? S.goals.slice(0, 4).map((g) => { const p = clamp(g.saved / g.target, 0, 1); const sim = simulate(g.target, g.saved, g.monthly, g.rate); return `<div class="budget-row"><div class="top"><b>${esc(g.name)}</b><span class="vals">${pct(p)}</span></div><div class="progress"><i style="width:${p * 100}%;background:${g.color}"></i></div><div class="muted" style="font-size:.74rem;margin-top:6px">${brl0(g.saved)} de ${brl0(g.target)} · ${sim.months === 0 ? 'concluída' : 'faltam ' + monthsTxt(sim.months)}</div></div>`; }).join('') : emptyBox('Crie sua primeira caixinha.', '<button class="btn btn-lime btn-sm" data-act="newGoal">Criar caixinha</button>')}
       </section>
     </div>
 
     <div class="grid g-main" style="margin-top:20px">
       <section class="card">
         <div class="card-head"><div><h3>Últimas transações</h3><span class="sub">Atualizadas pelo Open Finance</span></div><button class="link" data-go="transacoes">Ver todas</button></div>
-        <div class="tx-list">${last.length ? last.map(txRow).join('') : emptyBox('Sem transações. Conecte um banco ou lance manualmente.', '<button class="btn btn-lime btn-sm" data-act="connectBank">Conectar banco</button>')}</div>
+        <div class="tx-list">${last.length ? last.map(txRow).join('') : emptyBox('Sem transações ainda. Lance um gasto ou uma entrada, ou importe o extrato do seu banco.', '<button class="btn btn-lime btn-sm" data-act="connectBank">Conectar banco</button>')}</div>
       </section>
       <div class="stack">
-        ${tip ? `<section class="tip-hero"><img src="${MASCOT}" alt=""><div><b>Dica do mês</b><p><strong>${esc(tip.title)}.</strong> ${esc(tip.text)}</p><button class="link" data-go="aprender" style="margin-top:6px">Mais ${Math.max(0, tips.length - 1)} dicas →</button></div></section>` : ''}
+        ${tip ? `<section class="tip-hero"><img src="${MASCOT}" alt=""><div><b>Dica do mês</b><p><strong>${esc(tip.title)}.</strong> ${esc(tip.text)}</p><button class="link" data-go="aprender" style="margin-top:6px">Mais ${Math.max(0, tips.length - 1)} dicas </button></div></section>` : ''}
         <section class="card">
           <div class="card-head"><h3>Orçamentos</h3><button class="link" data-go="orcamentos">Ajustar</button></div>
           ${budgets.length ? budgets.map((b) => budgetRow(b.c, b.v, b.lim, ym)).join('') : emptyBox('Defina limites por categoria.', '<button class="btn btn-sm btn-lime" data-go="orcamentos">Criar orçamento</button>')}
@@ -801,8 +802,8 @@
         <div class="seg" role="group" aria-label="Tipo">${[['all', 'Todas'], ['out', 'Saídas'], ['in', 'Entradas']].map(([v, l]) => `<button data-act="ftype" data-v="${v}" class="${f.type === v ? 'on' : ''}">${l}</button>`).join('')}</div>
         <select class="select" data-filter="cat" aria-label="Categoria"><option value="">Todas as categorias</option>${opts(Object.keys(CATS).map((k) => [k, cat(k).name]), f.cat)}</select>
         <select class="select" data-filter="method" aria-label="Forma de pagamento"><option value="">Todas as formas</option>${opts(Object.entries(METHODS).map(([k, m]) => [k, m.name]), f.method)}</select>
-        <select class="select" data-filter="src" aria-label="Conta ou cartão"><option value="">Contas e cartões</option>${opts([...S.accounts.map((a) => ['a:' + a.id, a.name]), ...S.cards.map((c) => ['c:' + c.id, '💳 ' + c.name])], f.src)}</select>
-        <button class="btn btn-sm" data-act="exportCsv">⬇ CSV</button>
+        <select class="select" data-filter="src" aria-label="Conta ou cartão"><option value="">Contas e cartões</option>${opts([...S.accounts.map((a) => ['a:' + a.id, a.name]), ...S.cards.map((c) => ['c:' + c.id, '' + c.name])], f.src)}</select>
+        <button class="btn btn-sm" data-act="exportCsv">CSV</button>
       </div>
       <div id="txSummary"></div>
       <div class="tx-list" id="txList"></div>
@@ -840,7 +841,7 @@
         <div class="bc-top"><div style="display:flex;gap:12px;align-items:center"><span class="bank-logo" style="background:${b.color}">${b.short}</span><div><div class="bc-name">${esc(a.name)}</div><span style="font-size:.78rem" class="muted">${a.kind === 'dinheiro' ? 'Dinheiro em espécie' : 'Conta corrente'}</span></div></div>
         ${a.connected ? '<span class="tag tag-live">● Conectada</span>' : '<span class="tag">Manual</span>'}</div>
         <div class="bc-bottom"><div><small>Saldo disponível</small><b>${brl(accBalance(a))}</b></div>
-        <div style="display:flex;gap:6px">${a.connected ? `<button class="btn btn-sm" data-act="syncAcc" data-id="${a.id}">⟳ Sincronizar</button>` : ''}${a.connected && a.connectionId ? `<button class="btn btn-sm btn-ghost" data-act="disconnectAcc" data-id="${a.id}" title="Revogar consentimento">Desconectar</button>` : ''}<button class="btn btn-sm btn-ghost" data-act="editAcc" data-id="${a.id}" aria-label="Editar conta">✏️</button></div></div>
+        <div style="display:flex;gap:6px">${a.connected ? `<button class="btn btn-sm" data-act="syncAcc" data-id="${a.id}">⟳ Sincronizar</button>` : ''}${a.connected && a.connectionId ? `<button class="btn btn-sm btn-ghost" data-act="disconnectAcc" data-id="${a.id}" title="Revogar consentimento">Desconectar</button>` : ''}<button class="btn btn-sm btn-ghost" data-act="editAcc" data-id="${a.id}" aria-label="Editar conta"></button></div></div>
         ${a.connected ? `<span class="muted" style="font-size:.7rem;position:relative;z-index:1">Última sincronização: ${a.lastSync ? new Date(a.lastSync).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : '—'}</span>` : ''}
       </article>`;
     }).join('');
@@ -853,25 +854,25 @@
           <div class="bc-top"><div style="display:flex;gap:12px;align-items:center"><span class="bank-logo" style="background:${b.color};border-color:#fff">${b.short}</span><div class="bc-name">${esc(c.name)}</div></div><span style="font-weight:800;font-size:.85rem">${esc(c.brand || '')}</span></div>
           <div style="display:flex;align-items:center;gap:14px;position:relative;z-index:1"><span class="chipimg"></span><span class="bc-num">•••• •••• •••• ${esc(c.last4 || '0000')}</span></div>
           <div class="bc-bottom"><div><small>Fatura atual (aberta)</small><b>${brl(open)}</b></div><div style="text-align:right"><small>Vence dia</small><b>${c.dueDay}</b></div></div>
-          <div style="position:relative;z-index:1"><div class="progress"><i style="width:${c.limit ? clamp(used / c.limit, 0, 1) * 100 : 0}%;background:${used / c.limit > 0.7 ? '#D4553A' : '#3DBA85'}"></i></div><span style="font-size:.72rem;opacity:.9;display:block;margin-top:6px">Limite usado ${brl0(used)} de ${brl0(c.limit)} · disponível ${brl0(Math.max(0, c.limit - used))}</span></div>
+          <div style="position:relative;z-index:1"><div class="progress"><i style="width:${c.limit ? clamp(used / c.limit, 0, 1) * 100 : 0}%;background:${c.limit && used / c.limit > 0.7 ? '#D4553A' : '#3DBA85'}"></i></div><span style="font-size:.72rem;opacity:.9;display:block;margin-top:6px">Limite usado ${brl0(used)} de ${brl0(c.limit)} · disponível ${brl0(Math.max(0, c.limit - used))}</span></div>
         </article>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <button class="btn btn-sm" data-act="viewCard" data-id="${c.id}">Ver fatura</button>
           ${inv.map((i) => `<button class="btn btn-sm btn-lime" data-act="payInvoice" data-card="${c.id}" data-ym="${i.ym}">Pagar ${MS[parseD(i.ym + '-01').getMonth()]} · ${brl0(i.total)}</button>`).join('')}
-          <button class="btn btn-sm btn-ghost" data-act="editCard" data-id="${c.id}">✏️ Editar</button>${c.connected && c.connectionId ? `<button class="btn btn-sm btn-ghost" data-act="disconnectAcc" data-id="${c.id}">Desconectar</button>` : ''}
+          <button class="btn btn-sm btn-ghost" data-act="editCard" data-id="${c.id}">Editar</button>${c.connected && c.connectionId ? `<button class="btn btn-sm btn-ghost" data-act="disconnectAcc" data-id="${c.id}">Desconectar</button>` : ''}
         </div></div>`;
     }).join('');
     return `
     <div class="grid g-main">
       <section class="card cream" style="display:flex;gap:18px;align-items:center;flex-wrap:wrap">
-        <div style="flex:1;min-width:240px"><span class="pill">Open Finance</span><h3 class="display" style="font-size:1.6rem;margin-top:14px">Conecte seus bancos e cartões</h3>
-        <p class="muted" style="margin-top:8px;font-size:.9rem;line-height:1.5">Com o seu consentimento, o Finaxis lê saldos, faturas, Pix, compras e salário e já categoriza tudo. Sem senha do banco: a autorização acontece no app da sua instituição.</p></div>
-        <div style="display:flex;flex-direction:column;gap:10px"><button class="btn btn-lime btn-lg" data-act="connectBank">Conectar banco ${ARROW}</button><button class="btn btn-sm" data-act="newAccount">+ Conta manual</button><button class="btn btn-sm" data-act="newCard">+ Cartão manual</button></div>
+        <div style="flex:1;min-width:240px"><h3 class="display" style="font-size:1.6rem">Traga seus bancos e cartões</h3>
+        <p class="muted" style="margin-top:8px;font-size:.9rem;line-height:1.5">Importe o extrato da conta ou a fatura do cartão (OFX ou CSV, baixados no app do banco) e o Finaxis separa Pix, crédito, débito e salário, já categorizados. Prefere anotar à mão? Cadastre a conta ou o cartão e lance seus gastos e ganhos.</p></div>
+        <div style="display:flex;flex-direction:column;gap:10px"><button class="btn btn-lime btn-lg" data-act="importStatement">Importar extrato</button><button class="btn btn-sm" data-act="newAccount">+ Conta</button><button class="btn btn-sm" data-act="newCard">+ Cartão</button>${API.cfg && API.cfg.provider === 'pluggy' ? '<button class="link" data-act="connectBank" style="margin-top:2px">Sincronizar pelo MeuPluggy</button>' : ''}</div>
       </section>
       <section class="card">
         <div class="card-head"><h3>Tempo real</h3><span class="sync-dot ${S.settings.live ? '' : 'off'}"><i></i>${S.settings.live ? 'Ao vivo' : 'Pausado'}</span></div>
         <div class="setting"><div><b>Receber transações ao vivo</b><span>Novas compras e Pix aparecem assim que o banco envia.</span></div><label class="toggle"><input type="checkbox" data-setting="live" ${S.settings.live ? 'checked' : ''}><span></span></label></div>
-        <button class="btn btn-red btn-sm" data-act="simulateLive" style="margin-top:12px">⚡ Simular nova compra agora</button>
+        ${API.cfg && API.cfg.provider === 'demo' ? '<button class="btn btn-red btn-sm" data-act="simulateLive" style="margin-top:12px">Simular nova compra agora</button>' : ''}
       </section>
     </div>
     <h3 class="display" style="font-size:1.4rem;margin:30px 0 14px">Contas</h3>
@@ -893,7 +894,7 @@
     return `
     <div class="grid g-main">
       <section class="card">
-        <div class="card-head"><div><h3>Seus limites do mês</h3><span class="sub">${ymLabel(ym)} · ${withB.length} categorias</span></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-sm" data-act="suggestBudgets">✨ Sugerir</button><button class="btn btn-sm btn-lime" data-act="editBudgets">Editar limites</button></div></div>
+        <div class="card-head"><div><h3>Seus limites do mês</h3><span class="sub">${ymLabel(ym)} · ${withB.length} categorias</span></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-sm" data-act="suggestBudgets">Sugerir</button><button class="btn btn-sm btn-lime" data-act="editBudgets">Editar limites</button></div></div>
         ${withB.length ? withB.map((c) => budgetRow(c, st.byCat[c] || 0, S.budgets[c], ym)).join('') : emptyBox('Você ainda não definiu limites. Use “Sugerir” para criar a partir da sua média.')}
         ${noB.length ? `<div class="day-head" style="margin-top:8px"><span>Sem limite definido</span></div>${noB.map((c) => `<div class="bill"><div class="tx-ico">${catIco(c)}</div><div class="bill-info"><b>${cat(c).name}</b><span>Sem limite</span></div><div class="bill-amt">${brl0(st.byCat[c])}</div></div>`).join('')}` : ''}
       </section>
@@ -923,16 +924,16 @@
       <div class="card kpi"><div class="k-label">Aportes por mês</div><div class="k-value">${brl(totalMonthly)}</div><div class="k-foot muted">${S.profile.salary ? pct(totalMonthly / S.profile.salary) + ' do salário' : ''}</div></div>
       <div class="card kpi"><div class="k-label">Rendimento estimado em 12 meses</div><div class="k-value">${brl0(sum(S.goals, (x) => { const i = Math.pow(1 + (x.rate || 0) / 100, 1 / 12) - 1; let b = x.saved; for (let k = 0; k < 12; k++) b = b * (1 + i) + x.monthly; return b - x.saved - x.monthly * 12; }))}</div><div class="k-foot">Juros compostos trabalhando por você</div></div>
     </div>
-    <section class="card" style="margin-bottom:20px">
-      <div class="card-head"><div><h3>Investimentos e caixinhas dos bancos</h3><span class="sub">Saldo informado pela instituiÃ§Ã£o conectada</span></div><b>${brl(investmentTotal)}</b></div>
-      ${investments.length ? `<div class="stack" style="gap:8px">${investments.map((x) => `<div class="bill"><div class="bank-logo" style="background:${esc(x.bankColor || '#0B3D33')}">${esc((x.bankName || 'BN').slice(0, 2))}</div><div class="bill-info"><b>${esc(x.name)}</b><span>${esc(x.bankName || x.issuer || 'InstituiÃ§Ã£o')} Â· ${esc([x.subtype, x.rateType && x.rate != null ? `${x.rate}% ${x.rateType}` : ''].filter(Boolean).join(' Â· ') || x.type)}</span></div><div class="bill-amt">${moneyIn(x.balance, x.currencyCode)}</div></div>`).join('')}</div>` : `<p class="muted" style="font-size:.86rem;line-height:1.5">Nenhum investimento foi retornado pelas conexÃµes. Ao conectar o banco, autorize investimentos se essa opÃ§Ã£o aparecer. A disponibilidade depende do banco e do plano Pluggy. Estes valores sÃ£o somente leitura; as metas do Finaxis abaixo sÃ£o controles separados.</p>`}
-    </section>
+    ${investments.length ? `<section class="card" style="margin-bottom:20px">
+      <div class="card-head"><div><h3>Investimentos e caixinhas dos bancos</h3><span class="sub">Saldo informado pela instituição conectada</span></div><b>${brl(investmentTotal)}</b></div>
+      ${investments.length ? `<div class="stack" style="gap:8px">${investments.map((x) => `<div class="bill"><div class="bank-logo" style="background:${esc(x.bankColor || '#0B3D33')}">${esc((x.bankName || 'BN').slice(0, 2))}</div><div class="bill-info"><b>${esc(x.name)}</b><span>${esc(x.bankName || x.issuer || 'Instituição')} · ${esc([x.subtype, x.rateType && x.rate != null ? `${x.rate}% ${x.rateType}` : ''].filter(Boolean).join(' · ') || x.type)}</span></div><div class="bill-amt">${moneyIn(x.balance, x.currencyCode)}</div></div>`).join('')}</div>` : `<p class="muted" style="font-size:.86rem;line-height:1.5">Nenhum investimento foi retornado pelas conexões. Ao conectar o banco, autorize investimentos se essa opção aparecer. A disponibilidade depende do banco e do plano Pluggy. Estes valores são somente leitura; as metas do Finaxis abaixo são controles separados.</p>`}
+    </section>` : ''}
     <div class="grid g-3">${S.goals.map(goalCard).join('')}
       <button class="goal-new" data-act="newGoal"><div><div class="plus">+</div><b class="display" style="font-size:1.2rem">Nova caixinha</b><p class="muted" style="font-size:.84rem;margin-top:6px">Viagem, carro, casamento, reserva…</p></div></button>
     </div>
     <section class="card" style="margin-top:24px" id="simulator">
       <div class="card-head"><div><h3>Simulador de metas</h3><span class="sub">Mexa nos valores e veja quando você chega lá</span></div>
-        ${S.goals.length ? `<select class="select" style="width:auto" id="simPick" aria-label="Escolher caixinha"><option value="">Simulação livre</option>${S.goals.map((x) => `<option value="${x.id}" ${g && g.id === x.id ? 'selected' : ''}>${x.emoji} ${esc(x.name)}</option>`).join('')}</select>` : ''}</div>
+        ${S.goals.length ? `<select class="select" style="width:auto" id="simPick" aria-label="Escolher caixinha"><option value="">Simulação livre</option>${S.goals.map((x) => `<option value="${x.id}" ${g && g.id === x.id ? 'selected' : ''}>${esc(x.name)}</option>`).join('')}</select>` : ''}</div>
       <div class="sim">
         <div class="stack" style="gap:14px">
           <div class="field"><label for="sTarget">Valor da meta</label><div class="input-money"><input class="input" id="sTarget" type="number" min="0" step="50" value="${g ? g.target : 10000}"></div></div>
@@ -946,7 +947,7 @@
           <div class="chart-legend" style="margin-top:8px"><span><i style="background:#3DBA85"></i>Saldo com rendimento</span><span><i style="background:#3E5C76"></i>Só aportes</span><span><i style="background:#D4553A"></i>Meta</span></div>
           <h4 class="display" style="font-size:1rem;margin:20px 0 10px">E se…</h4>
           <div id="simWhatIf" class="stack" style="gap:8px"></div>
-          ${deliv > 100 ? `<div class="goal-eta" style="margin-top:12px">🍔 Você gasta em média <b>${brl0(deliv)}/mês</b> com alimentação fora. Cortando 30% e mandando para cá, são <b>+${brl0(deliv * 0.3)}/mês</b> na meta.</div>` : ''}
+          ${deliv > 100 ? `<div class="goal-eta" style="margin-top:12px">Você gasta em média <b>${brl0(deliv)}/mês</b> com alimentação fora. Cortando 30% e mandando para cá, são <b>+${brl0(deliv * 0.3)}/mês</b> na meta.</div>` : ''}
         </div>
       </div>
     </section>`;
@@ -962,7 +963,7 @@
       const d = addMonths(r.months === Infinity ? 0 : r.months);
       $('#simOut').innerHTML = `<span class="tag tag-light" style="align-self:flex-start">Você chega lá em</span>
         <div class="big">${r.months === Infinity ? '∞' : r.months === 0 ? 'JÁ!' : monthsTxt(r.months).toUpperCase()}</div>
-        <div>${r.months === Infinity ? 'Com aporte zero e sem rendimento, a meta não anda. Coloque qualquer valor mensal.' : r.months === 0 ? 'Você já tem o valor da meta. 🎉' : `Previsão: <b>${monthYear(d)}</b>`}</div>
+        <div>${r.months === Infinity ? 'Com aporte zero e sem rendimento, a meta não anda. Coloque qualquer valor mensal.' : r.months === 0 ? 'Você já tem o valor da meta. ' : `Previsão: <b>${monthYear(d)}</b>`}</div>
         ${r.months !== Infinity && r.months > 0 ? `<div class="row"><div>Você deposita<b>${brlRaw(monthly * r.months, 0)}</b></div><div>Rendimento<b style="color:#3DBA85">+${brlRaw(r.interest, 0)}</b></div><div>Saldo final<b>${brlRaw(r.final, 0)}</b></div></div>` : ''}`;
       const pts = r.months === Infinity ? Array.from({ length: 13 }, (_, i) => saved) : r.pts;
       $('#simChart').innerHTML = projChart(pts.length > 1 ? pts : [saved, saved], target, monthly);
@@ -985,7 +986,7 @@
     const push = (day, e) => { (ev[day] = ev[day] || []).push(e); };
     for (const r of S.recurring) if (r.active !== false && !(r.start && ym < r.start)) push(Math.min(r.day, dim), { t: r.desc, cls: r.amount > 0 ? 'in' : '', v: r.amount });
     for (const c of S.cards) { const prevYm = shiftYm(ym, -1); const tot = invoiceTotal(c, prevYm); if (tot > 0) push(Math.min(c.dueDay, dim), { t: `Fatura ${c.name.split(' ')[0]}`, cls: 'card', v: -tot }); }
-    for (const g of S.goals) if (g.autoDay && g.monthly) push(Math.min(g.autoDay, dim), { t: `🐷 ${g.name}`, cls: 'in', v: -g.monthly });
+    for (const g of S.goals) if (g.autoDay && g.monthly) push(Math.min(g.autoDay, dim), { t: `${g.name}`, cls: 'in', v: -g.monthly });
     const T = now();
     let cells = DOW.map((d) => `<div class="dow">${d}</div>`).join('');
     const first = d0.getDay();
@@ -1051,17 +1052,17 @@
   };
 
   const COURSES = [
-    { id: 'c1', title: 'Primeiros passos', color: '#D4553A', emoji: '🚀', lessons: [
+    { id: 'c1', title: 'Primeiros passos', color: '#D4553A', lessons: [
       { id: 'l1', t: 'Pague-se primeiro', body: ['A maioria das pessoas tenta guardar o que sobra no fim do mês. O problema: quase nunca sobra. A ideia de “pagar-se primeiro” inverte a ordem: assim que o salário cai, uma parte vai direto para a sua caixinha, como se fosse uma conta obrigatória.', 'Comece pequeno. 5% da renda já cria o hábito; depois aumente 1 ponto por mês até chegar a 15 ou 20%.'], tip: 'No Finaxis, ative o aporte automático da caixinha para o dia seguinte ao salário.' },
       { id: 'l2', t: 'A regra 50/30/20', body: ['É um jeito simples de dividir a renda líquida: 50% para necessidades (moradia, mercado, contas, transporte), 30% para desejos (delivery, compras, lazer) e 20% para o futuro (reserva, metas, investimentos).', 'Ela não é lei. Se o aluguel come metade do salário, ajuste para 60/20/20, mas mantenha a parte do futuro sempre visível.'], tip: 'A aba Orçamentos compara seus gastos reais com essa divisão automaticamente.' },
       { id: 'l3', t: 'Reserva de emergência', body: ['A reserva é o dinheiro que impede uma emergência (demissão, problema de saúde, conserto do carro) de virar dívida. O alvo comum é de 3 a 6 meses dos seus gastos essenciais.', 'Ela precisa ficar num lugar seguro e com resgate rápido, como um CDB de liquidez diária ou o Tesouro Selic. Rentabilidade aqui é secundária.'], tip: 'Crie uma caixinha do tipo “reserva”: ela conta para o seu Finaxis Score.' },
     ] },
-    { id: 'c2', title: 'Cartão sem sustos', color: '#3E5C76', emoji: '💳', lessons: [
+    { id: 'c2', title: 'Cartão sem sustos', color: '#3E5C76', lessons: [
       { id: 'l4', t: 'Como funciona a fatura', body: ['O cartão tem duas datas: fechamento e vencimento. Tudo o que você compra depois do fechamento só entra na fatura seguinte, e por isso comprar logo após o fechamento dá quase 40 dias até pagar.', 'Acompanhar a fatura aberta durante o mês evita a surpresa do “como gastei tudo isso?”.'], tip: 'Em Contas & cartões você vê a fatura atual e o limite usado em tempo real.' },
       { id: 'l5', t: 'Rotativo: o vilão', body: ['Pagar o mínimo da fatura joga o resto no crédito rotativo, uma das linhas de crédito mais caras do país, com juros que podem passar de 400% ao ano.', 'Se não der para pagar tudo, compare o parcelamento da fatura com um empréstimo pessoal mais barato. Qualquer opção costuma ser melhor que o rotativo.'], tip: 'Ative os lembretes de vencimento em Ajustes.' },
       { id: 'l6', t: 'Parcelar ou não?', body: ['Parcelar sem juros não é dinheiro grátis: cada parcela compromete a renda dos próximos meses. Somadas, várias parcelas pequenas viram uma conta fixa grande.', 'Regra prática: só parcele se a soma de todas as parcelas abertas couber em até 15% da sua renda mensal.'], tip: 'Ao lançar uma compra no crédito, use o campo de parcelas para ver o impacto nos meses seguintes.' },
     ] },
-    { id: 'c3', title: 'Fazendo render', color: '#0B3D33', emoji: '📈', lessons: [
+    { id: 'c3', title: 'Fazendo render', color: '#0B3D33', lessons: [
       { id: 'l7', t: 'Poupança, CDB ou Tesouro?', body: ['A poupança é simples, mas costuma render menos que alternativas igualmente seguras. CDBs que pagam 100% do CDI ou mais e o Tesouro Selic geralmente rendem mais, com garantia do FGC (no CDB) ou do Tesouro Nacional.', 'Fique atento ao Imposto de Renda, que é regressivo: quanto mais tempo o dinheiro fica aplicado, menor a alíquota.'], tip: 'O simulador de caixinhas permite comparar rendimentos: teste 6% x 10,5% ao ano.' },
       { id: 'l8', t: 'Juros compostos', body: ['Nos juros compostos, o rendimento de hoje também rende amanhã. No começo a diferença é pequena; com o tempo, a curva acelera.', 'Por isso começar cedo com pouco costuma valer mais do que começar tarde com muito.'], tip: 'No gráfico do simulador, a distância entre a linha cheia e a tracejada é o efeito dos juros.' },
       { id: 'l9', t: 'Metas SMART', body: ['Uma meta boa é específica, mensurável, atingível, relevante e tem prazo. “Juntar dinheiro” vira “juntar R$ 8.000 para a viagem ao Chile até julho”.', 'Com valor e prazo definidos, o aporte mensal necessário fica claro, e dá para acompanhar o progresso todo mês.'], tip: 'Cada caixinha do Finaxis já é uma meta SMART: valor, aporte e data prevista.' },
@@ -1082,7 +1083,7 @@
     <div class="grid g-main">
       <section class="card">
         <div class="card-head"><div><h3>Dicas para você</h3><span class="sub">Geradas a partir dos seus gastos de ${ymLabel(UI.ym).toLowerCase()}</span></div><span class="chip">${tips.length} dicas</span></div>
-        ${tips.map((t) => `<div class="tip ${t.kind}"><div class="t-ico">${uiIco(t.ico)}</div><div><b>${esc(t.title)}</b><p>${esc(t.text)}</p>${t.save ? `<span class="chip t-save chip-pos">Potencial: ${brl0(t.save)}/mês</span>` : ''}</div></div>`).join('') || emptyBox('Tudo em ordem por aqui! 🎉')}
+        ${tips.map((t) => `<div class="tip ${t.kind}"><div class="t-ico">${uiIco(t.ico, t.kind)}</div><div><b>${esc(t.title)}</b><p>${esc(t.text)}</p>${t.save ? `<span class="chip t-save chip-pos">Potencial: ${brl0(t.save)}/mês</span>` : ''}</div></div>`).join('') || emptyBox('Tudo em ordem por aqui! ')}
       </section>
       <div class="stack">
         <section class="score-card" style="flex-direction:row">
@@ -1100,7 +1101,7 @@
               const failed = ch.check && !ch.check(st.joined);
               const done = st.done || (!failed && days >= ch.days);
               const p = done ? 1 : clamp(days / ch.days, 0, 1);
-              body = failed ? `<span class="chip" style="background:#D4553A;color:#fff">Quebrou 😅</span> <button class="link" data-act="joinCh" data-id="${ch.id}">Recomeçar</button>` : done ? `<span class="chip chip-pos">Concluído ✓</span>` : `<div class="progress" style="height:9px"><i style="width:${Math.max(4, p * 100)}%"></i></div><span class="muted" style="font-size:.72rem">${days} de ${ch.days} dias</span> ${ch.days <= 3 ? `<button class="link" data-act="doneCh" data-id="${ch.id}">Marcar como feito</button>` : ''}`;
+              body = failed ? `<span class="chip" style="background:#D4553A;color:#fff">Quebrou </span> <button class="link" data-act="joinCh" data-id="${ch.id}">Recomeçar</button>` : done ? `<span class="chip chip-pos">Concluído </span>` : `<div class="progress" style="height:9px"><i style="width:${Math.max(4, p * 100)}%"></i></div><span class="muted" style="font-size:.72rem">${days} de ${ch.days} dias</span> ${ch.days <= 3 ? `<button class="link" data-act="doneCh" data-id="${ch.id}">Marcar como feito</button>` : ''}`;
             }
             return `<div class="challenge"><div class="c-ico">${uiIco(ch.ico)}</div><div class="c-main"><b>${ch.t}</b><p>${ch.d}</p>${body}</div><span class="xp">+${ch.xp}</span></div>`;
           }).join('')}
@@ -1108,7 +1109,7 @@
       </div>
     </div>
     <h3 class="display" style="font-size:1.4rem;margin:30px 0 14px">Trilhas de educação financeira</h3>
-    <div class="grid g-3">${COURSES.map((c) => { const done = c.lessons.filter((l) => S.learn.done.includes(l.id)).length; return `<article class="course"><div class="course-top" style="background:${c.color}"><span style="font-size:2rem">${c.emoji}</span><div><span class="tag tag-light">${done}/${c.lessons.length} aulas</span><h4 style="margin-top:8px">${c.title}</h4></div></div><div class="course-body">${c.lessons.map((l) => `<button class="lesson ${S.learn.done.includes(l.id) ? 'done' : ''}" data-act="openLesson" data-id="${l.id}"><span class="ck">${S.learn.done.includes(l.id) ? '✓' : ''}</span>${l.t}<span class="muted" style="margin-left:auto;font-size:.72rem">3 min</span></button>`).join('')}</div></article>`; }).join('')}</div>`;
+    <div class="grid g-3">${COURSES.map((c) => { const done = c.lessons.filter((l) => S.learn.done.includes(l.id)).length; return `<article class="course"><div class="course-top" style="background:${c.color}"><div><span class="tag tag-light">${done}/${c.lessons.length} aulas</span><h4 style="margin-top:8px">${c.title}</h4></div></div><div class="course-body">${c.lessons.map((l) => `<button class="lesson ${S.learn.done.includes(l.id) ? 'done' : ''}" data-act="openLesson" data-id="${l.id}"><span class="ck">${S.learn.done.includes(l.id) ? '' : ''}</span>${l.t}<span class="muted" style="margin-left:auto;font-size:.72rem">3 min</span></button>`).join('')}</div></article>`; }).join('')}</div>`;
   };
 
   V.ajustes = () => `
@@ -1136,8 +1137,8 @@
         <div class="card-head"><h3>Seus dados</h3></div>
         <p class="muted" style="font-size:.86rem;line-height:1.5;margin-bottom:14px">Seus dados ficam salvos na sua conta e sincronizados entre dispositivos.${Object.keys(S.learned).length ? ` O app já aprendeu ${Object.keys(S.learned).length} regra(s) de categoria com você.` : ''}</p>
         <div style="display:flex;gap:10px;flex-wrap:wrap">
-          <button class="btn btn-sm" data-act="exportCsv">⬇ Exportar CSV</button>
-          <button class="btn btn-sm" data-act="exportJson">⬇ Backup (JSON)</button>
+          <button class="btn btn-sm" data-act="exportCsv">Exportar CSV</button>
+          <button class="btn btn-sm" data-act="exportJson">Backup (JSON)</button>
           <button class="btn btn-sm btn-red" data-act="startEmpty">Começar do zero</button>
         </div>
       </section>
@@ -1157,7 +1158,7 @@
     $('#view').innerHTML = `<div class="view">${(V[r] || V.painel)()}</div>`;
     $('#viewTitle').innerHTML = TITLES[r] || '';
     const h = now().getHours();
-    $('#hello').textContent = `${h < 12 ? 'Bom dia' : h < 18 ? 'Boa tarde' : 'Boa noite'}, ${S.profile.name} 👋`;
+    $('#hello').textContent = `${h < 12 ? 'Bom dia' : h < 18 ? 'Boa tarde' : 'Boa noite'}, ${S.profile.name} `;
     $('#monthLabel').textContent = ymLabel(UI.ym);
     $('#monthSwitch').style.display = ['contas', 'caixinhas', 'aprender', 'ajustes'].includes(r) ? 'none' : '';
     $$('[data-route]').forEach((a) => a.classList.toggle('active', a.dataset.route === r));
@@ -1174,6 +1175,9 @@
   }
   function buildNav() {
     $('#sideNav').innerHTML = `<span class="label">Menu</span>${navHtml()}`;
+    const short = { contas: 'Contas', calendario: 'Contas fixas', aprender: 'Aprender' };
+    $('#topNav').innerHTML = ROUTES.map((x) => `<a href="#/${x.id}" data-route="${x.id}">${short[x.id] || x.name}</a>`).join('');
+    $('#moreBtn').innerHTML = icon('menu');
     const b = (id) => { const x = ROUTES.find((r) => r.id === id); return `<a href="#/${id}" data-route="${id}"><span class="ico">${icon(x.ico)}</span>${x.name.split(' ')[0]}</a>`; };
     $('#bottomNav').innerHTML = `${b('painel')}${b('transacoes')}<button class="fab" data-act="addTx" aria-label="Novo lançamento">+</button>${b('caixinhas')}<a href="#" data-act="more"><span class="ico">${icon('menu')}</span>Mais</a>`;
   }
@@ -1189,7 +1193,7 @@
   /* -------------------------------------------------------- modal/toast */
   function openModal({ title, body, wide, foot = '', onMount }) {
     const root = $('#modalRoot');
-    root.innerHTML = `<div class="modal-back" data-close><div class="modal ${wide ? 'wide' : ''}" role="dialog" aria-modal="true" aria-label="${esc(title.replace(/<[^>]+>/g, ''))}"><div class="modal-head"><h3>${title}</h3><button class="icon-btn" data-close aria-label="Fechar">✕</button></div><div class="modal-body">${body}</div>${foot ? `<div class="modal-foot">${foot}</div>` : ''}</div></div>`;
+    root.innerHTML = `<div class="modal-back" data-close><div class="modal ${wide ? 'wide' : ''}" role="dialog" aria-modal="true" aria-label="${esc(title.replace(/<[^>]+>/g, ''))}"><div class="modal-head"><h3>${title}</h3><button class="icon-btn" data-close aria-label="Fechar"></button></div><div class="modal-body">${body}</div>${foot ? `<div class="modal-foot">${foot}</div>` : ''}</div></div>`;
     const m = $('.modal', root);
     root.firstElementChild.addEventListener('click', (e) => { if (e.target.hasAttribute('data-close') || e.target.closest('.modal-head [data-close]')) closeModal(); });
     if (onMount) onMount(m);
@@ -1197,10 +1201,10 @@
     return m;
   }
   function closeModal() { $('#modalRoot').innerHTML = ''; }
-  function toast(html, ico = '✨', ms = 4200) {
+  function toast(html, ms = 4200) {
     const t = document.createElement('div');
     t.className = 'toast';
-    t.innerHTML = `<span class="t-ico">${ico}</span><div>${html}</div>`;
+    t.innerHTML = `<div>${html}</div>`;
     $('#toasts').appendChild(t);
     setTimeout(() => { t.classList.add('out'); setTimeout(() => t.remove(), 320); }, ms);
   }
@@ -1208,8 +1212,8 @@
 
   /* ---------------------------------------------------------- formulários */
   function srcOptions(sel, onlyAccounts) {
-    const a = S.accounts.map((x) => `<option value="a:${x.id}" ${sel === 'a:' + x.id ? 'selected' : ''}>🏦 ${esc(x.name)}</option>`).join('');
-    const c = onlyAccounts ? '' : S.cards.map((x) => `<option value="c:${x.id}" ${sel === 'c:' + x.id ? 'selected' : ''}>💳 ${esc(x.name)}</option>`).join('');
+    const a = S.accounts.map((x) => `<option value="a:${x.id}" ${sel === 'a:' + x.id ? 'selected' : ''}>${esc(x.name)}</option>`).join('');
+    const c = onlyAccounts ? '' : S.cards.map((x) => `<option value="c:${x.id}" ${sel === 'c:' + x.id ? 'selected' : ''}>${esc(x.name)}</option>`).join('');
     return a + c;
   }
   function catPicker(sel, income) {
@@ -1235,7 +1239,7 @@
         ${sys ? `<div class="field full"><span class="chip">${catIco(tx.cat)} ${cat(tx.cat).name} (gerado pelo sistema)</span></div>` : `<div class="field full"><label>Categoria</label><div class="cat-pick" id="tCats">${catPicker(curCat, income)}</div></div>`}
         ${!isNew && !sys ? `<label class="field full" style="flex-direction:row;align-items:center;gap:10px;font-size:.85rem"><input type="checkbox" id="tLearn" checked> Usar essa categoria sempre para “${esc(normDesc(tx.desc))}”</label>` : ''}
       </div>`;
-    const foot = `${!isNew ? '<button class="btn btn-sm btn-ghost neg" data-act-m="del" style="margin-right:auto">🗑 Excluir</button>' : ''}<button class="btn btn-sm" data-close>Cancelar</button><button class="btn btn-lime" data-act-m="save">${isNew ? 'Adicionar' : 'Salvar'}</button>`;
+    const foot = `${!isNew ? '<button class="btn btn-sm btn-ghost neg" data-act-m="del" style="margin-right:auto">Excluir</button>' : ''}<button class="btn btn-sm" data-close>Cancelar</button><button class="btn btn-lime" data-act-m="save">${isNew ? 'Adicionar' : 'Salvar'}</button>`;
     openModal({ title: isNew ? 'Novo lançamento' : 'Editar transação', body, foot, onMount: (m) => {
       const setCats = () => { const box = $('#tCats', m); if (box) box.innerHTML = catPicker(curCat, income); };
       const hint = () => {
@@ -1249,7 +1253,7 @@
         const n = +$('#tInst', m).value, v = +$('#tAmt', m).value || 0;
         $('#tInstHint', m).textContent = n > 1 ? `${n}x de ${brlRaw(v / n)} nas próximas faturas` : '';
       };
-      $('#tType', m).addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; income = b.dataset.v === 'in'; $$('#tType button', m).forEach((x) => x.classList.toggle('on', x === b)); if (!sys) { curCat = income ? 'pixrecebido' : 'outros'; picked = false; setCats(); hint(); } instUpd(); });
+      $('#tType', m).addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; income = b.dataset.v === 'in'; $$('#tType button', m).forEach((x) => x.classList.toggle('on', x === b)); if (!sys) { curCat = income ? 'outrasentradas' : 'outros'; picked = false; setCats(); hint(); } instUpd(); });
       m.addEventListener('click', (e) => { const b = e.target.closest('[data-cat]'); if (!b) return; curCat = b.dataset.cat; picked = true; setCats(); hint(); });
       $('#tDesc', m).addEventListener('input', hint);
       $('#tMethod', m).addEventListener('change', () => {
@@ -1262,7 +1266,7 @@
       instUpd(); hint();
       m.addEventListener('click', (e) => {
         const a = e.target.closest('[data-act-m]'); if (!a) return;
-        if (a.dataset.actM === 'del') { if (confirm('Excluir esta transação?')) { S.tx = S.tx.filter((x) => x.id !== t.id); if (t.goalId) { const g = S.goals.find((x) => x.id === t.goalId); if (g) g.saved = Math.max(0, g.saved + t.amount); } closeModal(); commit(); toast('Transação excluída', '🗑'); } return; }
+        if (a.dataset.actM === 'del') { if (confirm('Excluir esta transação?')) { S.tx = S.tx.filter((x) => x.id !== t.id); if (t.goalId) { const g = S.goals.find((x) => x.id === t.goalId); if (g) g.saved = Math.max(0, g.saved + t.amount); } closeModal(); commit(); toast('Transação excluída'); } return; }
         const v = Math.abs(+$('#tAmt', m).value);
         if (!v) { $('#tAmt', m).focus(); $('#tAmt', m).style.borderColor = '#D4553A'; return; }
         const desc = $('#tDesc', m).value.trim() || cat(curCat).name;
@@ -1276,7 +1280,7 @@
             for (let i = 0; i < n; i++) { const di = new Date(d.getFullYear(), d.getMonth() + i, Math.min(d.getDate(), daysIn(d.getFullYear(), d.getMonth() + i))); const amt = i === n - 1 ? Math.round((base.amount - per * (n - 1)) * 100) / 100 : per; const tt = { ...base, id: uid(), ts: Date.now(), source: 'manual', amount: amt, desc: `${desc} (${i + 1}/${n})`, date: ymd(di) }; S.tx.push(tt); UI.fresh.add(tt.id); }
           } else { const tt = { ...base, id: uid(), ts: Date.now(), source: 'manual' }; S.tx.push(tt); UI.fresh.add(tt.id); }
           if (picked && autoCat(desc, base.amount) !== curCat && !sys) S.learned[normDesc(desc)] = curCat;
-          closeModal(); commit(); toast(`<b>${esc(desc)}</b> lançado em ${cat(base.cat).name}`, '✅');
+          closeModal(); commit(); toast(`<b>${esc(desc)}</b> lançado em ${cat(base.cat).name}`);
           budgetCheck(base.cat);
         } else {
           Object.assign(t, base);
@@ -1284,7 +1288,7 @@
           if (learn && learn.checked && !sys) {
             const key = normDesc(desc); S.learned[key] = curCat;
             let n = 0; S.tx.forEach((x) => { if (x !== t && normDesc(x.desc) === key && x.cat !== curCat && !cat(x.cat).system) { x.cat = curCat; n++; } });
-            if (n) toast(`Recategorizei mais <b>${n}</b> transações iguais`, '🧠');
+            if (n) toast(`Recategorizei mais <b>${n}</b> transações iguais`);
           }
           closeModal(); commit();
         }
@@ -1295,18 +1299,16 @@
   function budgetCheck(c) {
     const lim = S.budgets[c]; if (!lim) return;
     const v = monthStats(ymOf(now())).byCat[c] || 0;
-    if (v > lim) toast(`Orçamento de <b>${cat(c).name}</b> estourado: ${brl0(v)} de ${brl0(lim)}`, '🚨', 6000);
-    else if (v > lim * 0.8) toast(`Atenção: você já usou <b>${pct(v / lim)}</b> do orçamento de ${cat(c).name}`, '⚠️', 6000);
+    if (v > lim) toast(`Orçamento de <b>${cat(c).name}</b> estourado: ${brl0(v)} de ${brl0(lim)}`, 6000);
+    else if (v > lim * 0.8) toast(`Atenção: você já usou <b>${pct(v / lim)}</b> do orçamento de ${cat(c).name}`, 6000);
   }
 
   function goalModal(g) {
     const isNew = !g;
-    const x = g || { name: '', emoji: '🎯', target: '', saved: 0, monthly: 200, rate: 10.5, color: '#D4553A', autoDay: Math.min(28, (S.profile.payday || 5) + 1), accountId: S.accounts[0].id };
-    const EM = ['✈️', '🏠', '🚗', '🎮', '💍', '🛟', '🎓', '💻', '📱', '🏖️', '🐶', '🎯'];
+    const x = g || { name: '', target: '', saved: 0, monthly: 200, rate: 10.5, color: '#D4553A', autoDay: Math.min(28, (S.profile.payday || 5) + 1), accountId: S.accounts[0].id };
     const COLORS = ['#D4553A', '#3DBA85', '#3E5C76', '#0B3D33', '#E6EEEB'];
     const body = `<div class="form-grid">
       <div class="field full"><label for="gName">Nome da caixinha</label><input class="input" id="gName" value="${esc(x.name)}" placeholder="Ex.: Viagem para o Chile"></div>
-      <div class="field full"><label>Ícone</label><div class="cat-pick" id="gEm" style="grid-template-columns:repeat(auto-fill,minmax(44px,1fr))">${EM.map((e) => `<button type="button" data-em="${e}" class="${e === x.emoji ? 'on' : ''}"><span>${e}</span></button>`).join('')}</div></div>
       <div class="field full"><label>Cor</label><div style="display:flex;gap:8px;flex-wrap:wrap" id="gCol">${COLORS.map((c) => `<button type="button" data-col="${c}" aria-label="Cor ${c}" style="width:34px;height:34px;border-radius:50%;background:${c};border:2px solid #0B3D33;${c === x.color ? 'box-shadow:0 0 0 3px #F3F5F4,0 0 0 5px #0B3D33' : ''}"></button>`).join('')}</div></div>
       <div class="field"><label for="gTarget">Valor da meta</label><div class="input-money"><input class="input" id="gTarget" type="number" min="1" step="50" value="${x.target}"></div></div>
       <div class="field"><label for="gSaved">Já tenho guardado</label><div class="input-money"><input class="input" id="gSaved" type="number" min="0" step="50" value="${Math.round(x.saved)}" ${isNew ? '' : 'disabled'}></div>${isNew ? '' : '<span class="hint">Use Guardar/Resgatar para movimentar</span>'}</div>
@@ -1317,12 +1319,11 @@
       <label class="field full" style="flex-direction:row;align-items:center;gap:10px;font-size:.85rem"><input type="checkbox" id="gRes" ${x.kind === 'reserva' ? 'checked' : ''}> Esta é minha reserva de emergência</label>
       <div class="goal-eta full" id="gPrev"></div>
     </div>`;
-    const foot = `${!isNew ? '<button class="btn btn-sm btn-ghost neg" data-act-m="del" style="margin-right:auto">🗑 Excluir</button>' : ''}<button class="btn btn-sm" data-close>Cancelar</button><button class="btn btn-lime" data-act-m="save">${isNew ? 'Criar caixinha' : 'Salvar'}</button>`;
-    let em = x.emoji, col = x.color;
+    const foot = `${!isNew ? '<button class="btn btn-sm btn-ghost neg" data-act-m="del" style="margin-right:auto">Excluir</button>' : ''}<button class="btn btn-sm" data-close>Cancelar</button><button class="btn btn-lime" data-act-m="save">${isNew ? 'Criar caixinha' : 'Salvar'}</button>`;
+    let col = x.color;
     openModal({ title: isNew ? 'Nova caixinha' : 'Editar caixinha', body, foot, onMount: (m) => {
-      const prev = () => { const r = simulate(+$('#gTarget', m).value || 0, +$('#gSaved', m).value || 0, +$('#gMonthly', m).value || 0, +$('#gRate', m).value || 0); $('#gPrev', m).innerHTML = (+$('#gTarget', m).value) ? (r.months === Infinity ? 'Defina um aporte mensal para ver a previsão.' : `📅 Previsão: <b>${monthsTxt(r.months)}</b> (${monthYear(addMonths(r.months))})${r.interest > 1 ? `, com <b>${brlRaw(r.interest, 0)}</b> de rendimento` : ''}.`) : 'Preencha o valor da meta para ver a previsão.'; };
+      const prev = () => { const r = simulate(+$('#gTarget', m).value || 0, +$('#gSaved', m).value || 0, +$('#gMonthly', m).value || 0, +$('#gRate', m).value || 0); $('#gPrev', m).innerHTML = (+$('#gTarget', m).value) ? (r.months === Infinity ? 'Defina um aporte mensal para ver a previsão.' : `Previsão: <b>${monthsTxt(r.months)}</b> (${monthYear(addMonths(r.months))})${r.interest > 1 ? `, com <b>${brlRaw(r.interest, 0)}</b> de rendimento` : ''}.`) : 'Preencha o valor da meta para ver a previsão.'; };
       $$('input', m).forEach((i) => i.addEventListener('input', prev)); prev();
-      $('#gEm', m).addEventListener('click', (e) => { const b = e.target.closest('[data-em]'); if (!b) return; em = b.dataset.em; $$('#gEm button', m).forEach((z) => z.classList.toggle('on', z === b)); });
       $('#gCol', m).addEventListener('click', (e) => { const b = e.target.closest('[data-col]'); if (!b) return; col = b.dataset.col; $$('#gCol button', m).forEach((z) => { z.style.boxShadow = z === b ? '0 0 0 3px #F3F5F4,0 0 0 5px #0B3D33' : ''; }); });
       m.addEventListener('click', (e) => {
         const a = e.target.closest('[data-act-m]'); if (!a) return;
@@ -1330,11 +1331,11 @@
         const name = $('#gName', m).value.trim(), target = +$('#gTarget', m).value;
         if (!name) { $('#gName', m).focus(); return; } if (!target) { $('#gTarget', m).focus(); return; }
         const o = g || { id: uid(), saved: +$('#gSaved', m).value || 0, accountId: S.accounts[0].id };
-        Object.assign(o, { name, emoji: em, color: col, target, monthly: +$('#gMonthly', m).value || 0, rate: +$('#gRate', m).value || 0, autoDay: $('#gAuto', m).checked ? clamp(+$('#gDay', m).value || 1, 1, 28) : null, kind: $('#gRes', m).checked ? 'reserva' : undefined });
+        Object.assign(o, { name, color: col, target, monthly: +$('#gMonthly', m).value || 0, rate: +$('#gRate', m).value || 0, autoDay: $('#gAuto', m).checked ? clamp(+$('#gDay', m).value || 1, 1, 28) : null, kind: $('#gRes', m).checked ? 'reserva' : undefined });
         if (isNew || !o.start) { const T = now(); o.start = o.autoDay && o.autoDay < T.getDate() ? shiftYm(ymOf(T), 1) : ymOf(T); }
         if (isNew) S.goals.push(o);
         UI.simGoal = o.id;
-        closeModal(); commit(); toast(`Caixinha <b>${esc(name)}</b> ${isNew ? 'criada' : 'atualizada'}!`, em);
+        closeModal(); commit(); toast(`Caixinha <b>${esc(name)}</b> ${isNew ? 'criada' : 'atualizada'}.`);
       });
     } });
   }
@@ -1343,7 +1344,7 @@
     const body = `<div class="field"><label for="mvAmt">${dir > 0 ? 'Quanto guardar agora?' : 'Quanto resgatar?'}</label><div class="input-money"><input class="input" id="mvAmt" type="number" min="0" step="10" value="${dir > 0 ? g.monthly || 100 : ''}"></div>${dir < 0 ? `<span class="hint">Disponível: ${brlRaw(g.saved)}</span>` : ''}</div>
       <div class="field" style="margin-top:14px"><label for="mvAcc">${dir > 0 ? 'Sair de' : 'Voltar para'}</label><select class="select" id="mvAcc">${srcOptions('a:' + (g.accountId || S.accounts[0].id), true)}</select></div>
       ${dir > 0 ? '<div class="field" style="margin-top:14px"><label>Atalhos</label><div style="display:flex;gap:8px;flex-wrap:wrap" id="mvQuick">' + [50, 100, 200, 500].map((v) => `<button type="button" class="btn btn-sm" data-v="${v}">+${v}</button>`).join('') + '</div></div>' : ''}`;
-    openModal({ title: `${g.emoji} ${dir > 0 ? 'Guardar em' : 'Resgatar de'} ${esc(g.name)}`, body, foot: `<button class="btn btn-sm" data-close>Cancelar</button><button class="btn btn-lime" id="mvOk">Confirmar</button>`, onMount: (m) => {
+    openModal({ title: `${dir > 0 ? 'Guardar em' : 'Resgatar de'} ${esc(g.name)}`, body, foot: `<button class="btn btn-sm" data-close>Cancelar</button><button class="btn btn-lime" id="mvOk">Confirmar</button>`, onMount: (m) => {
       const q = $('#mvQuick', m); if (q) q.addEventListener('click', (e) => { const b = e.target.closest('[data-v]'); if (b) $('#mvAmt', m).value = b.dataset.v; });
       $('#mvOk', m).addEventListener('click', () => {
         let v = Math.abs(+$('#mvAmt', m).value); if (!v) return;
@@ -1352,8 +1353,8 @@
         S.tx.push({ id: uid(), ts: Date.now(), date: todayStr(), desc: `${dir > 0 ? 'Caixinha' : 'Resgate'} · ${g.name}`, amount: -dir * v, cat: 'caixinha', method: 'ted', accountId: id, goalId: g.id, source: 'manual' });
         const before = g.saved; g.saved += dir * v;
         closeModal(); commit();
-        if (before < g.target && g.saved >= g.target) toast(`🎉 <b>Meta batida!</b> ${esc(g.name)} chegou a ${brl0(g.saved)}.`, '🏆', 7000);
-        else toast(`${dir > 0 ? 'Guardado' : 'Resgatado'}: <b>${brlRaw(v)}</b> ${dir > 0 ? 'em' : 'de'} ${esc(g.name)}`, g.emoji);
+        if (before < g.target && g.saved >= g.target) toast(`<b>Meta batida!</b> ${esc(g.name)} chegou a ${brl0(g.saved)}.`, 7000);
+        else toast(`${dir > 0 ? 'Guardado' : 'Resgatado'}: <b>${brlRaw(v)}</b> ${dir > 0 ? 'em' : 'de'} ${esc(g.name)}`);
       });
     } });
   }
@@ -1372,7 +1373,7 @@
         <div class="field full"><label for="rSrc">Conta / cartão</label><select class="select" id="rSrc">${srcOptions(x.cardId ? 'c:' + x.cardId : 'a:' + x.accountId)}</select></div>
         ${!isNew ? `<label class="field full" style="flex-direction:row;align-items:center;gap:10px;font-size:.85rem"><input type="checkbox" id="rActive" ${x.active !== false ? 'checked' : ''}> Ativa (lançar automaticamente todo mês)</label>` : ''}
       </div>`;
-    const foot = `${!isNew ? '<button class="btn btn-sm btn-ghost neg" data-act-m="del" style="margin-right:auto">🗑 Excluir</button>' : ''}<button class="btn btn-sm" data-close>Cancelar</button><button class="btn btn-lime" data-act-m="save">Salvar</button>`;
+    const foot = `${!isNew ? '<button class="btn btn-sm btn-ghost neg" data-act-m="del" style="margin-right:auto">Excluir</button>' : ''}<button class="btn btn-sm" data-close>Cancelar</button><button class="btn btn-lime" data-act-m="save">Salvar</button>`;
     openModal({ title: isNew ? 'Nova conta fixa' : 'Editar conta fixa', body, foot, onMount: (m) => {
       $('#rType', m).addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; income = b.dataset.v === 'in'; $$('#rType button', m).forEach((z) => z.classList.toggle('on', z === b)); $('#rCat', m).value = income ? 'salario' : 'contas'; });
       $('#rDesc', m).addEventListener('input', () => { const g = autoCat($('#rDesc', m).value, income ? 1 : -1); if (g !== 'outros' && g !== 'pixrecebido') $('#rCat', m).value = g; });
@@ -1387,7 +1388,7 @@
         if (!isNew) o.active = $('#rActive', m).checked;
         if (isNew) { const T = now(); o.start = o.day < T.getDate() ? shiftYm(ymOf(T), 1) : ymOf(T); S.recurring.push(o); }
         postRecurring(S);
-        closeModal(); commit(); toast(`<b>${esc(desc)}</b> será lançada todo dia ${o.day}`, '📅');
+        closeModal(); commit(); toast(`<b>${esc(desc)}</b> será lançada todo dia ${o.day}`);
       });
     } });
   }
@@ -1396,14 +1397,14 @@
     const body = `<p class="muted" style="font-size:.85rem;margin-bottom:14px">${sugg ? 'Sugestão baseada na média dos últimos 3 meses, com 10% de economia. Ajuste como quiser.' : 'Deixe em branco para não limitar a categoria.'}</p>
       <div class="form-grid">${EXP_CATS.map((c) => `<div class="field"><label for="b_${c}" style="display:flex;gap:6px;align-items:center">${catIco(c)} ${cat(c).name}</label><div class="input-money"><input class="input" id="b_${c}" data-b="${c}" type="number" min="0" step="10" value="${sugg ? (sugg[c] || '') : (S.budgets[c] || '')}"></div></div>`).join('')}</div>`;
     openModal({ title: 'Limites mensais', body, wide: true, foot: `<button class="btn btn-sm" data-close>Cancelar</button><button class="btn btn-lime" id="bOk">Salvar limites</button>`, onMount: (m) => {
-      $('#bOk', m).addEventListener('click', () => { const b = {}; $$('[data-b]', m).forEach((i) => { const v = +i.value; if (v > 0) b[i.dataset.b] = v; }); S.budgets = b; closeModal(); commit(); toast('Orçamentos atualizados', '🎯'); });
+      $('#bOk', m).addEventListener('click', () => { const b = {}; $$('[data-b]', m).forEach((i) => { const v = +i.value; if (v > 0) b[i.dataset.b] = v; }); S.budgets = b; closeModal(); commit(); toast('Orçamentos atualizados'); });
     } });
   }
 
   function cardModal(c) {
     const isNew = !c;
     const x = c || { name: '', bank: 'nubank', brand: 'Mastercard', last4: '', limit: 3000, dueDay: 10, accountId: S.accounts[0].id };
-    const body = `<p class="muted" style="font-size:.85rem;line-height:1.5;margin-bottom:14px">Cadastro manual serve apenas para organizar o cartão. Para importar faturas e compras automaticamente, conecte o banco pelo Open Finance. Nunca informe o número completo do cartão.</p><div class="form-grid">
+    const body = `<p class="muted" style="font-size:.85rem;line-height:1.5;margin-bottom:14px">Cadastro manual serve apenas para organizar o cartão. Para trazer as compras sem digitar, importe a fatura do cartão em Contas & cartões. Nunca informe o número completo do cartão.</p><div class="form-grid">
       <div class="field full"><label for="cName">Nome do cartão</label><input class="input" id="cName" value="${esc(x.name)}" placeholder="Ex.: Nubank Roxinho"></div>
       <div class="field"><label for="cBank">Banco</label><select class="select" id="cBank">${Object.entries(BANKS).filter(([k]) => k !== 'cash').map(([k, b]) => `<option value="${k}" ${x.bank === k ? 'selected' : ''}>${b.name}</option>`).join('')}</select></div>
       <div class="field"><label for="cBrand">Bandeira</label><select class="select" id="cBrand">${['Mastercard', 'Visa', 'Elo', 'Amex', 'Hipercard'].map((b) => `<option ${x.brand === b ? 'selected' : ''}>${b}</option>`).join('')}</select></div>
@@ -1472,11 +1473,11 @@
         box.innerHTML = `${steps()}<div style="display:flex;gap:14px;align-items:center;margin-bottom:16px"><span class="bank-logo" style="background:${b.color};width:54px;height:54px">${b.short}</span><div><b style="font-size:1.1rem">${b.name}</b><p class="muted" style="font-size:.84rem">O Finaxis está pedindo acesso de leitura aos seus dados</p></div></div>
           <div class="consent"><b>Dados compartilhados</b><ul style="margin-top:6px"><li>Saldos e extratos de conta</li><li>Cartões de crédito, limites e faturas</li><li>Transações: Pix, débito, crédito, boletos e TED</li></ul>
           <p style="margin-top:10px"><b>Prazo:</b> 12 meses (você pode revogar quando quiser)<br><b>Finalidade:</b> controle financeiro e categorização de gastos</p></div>
-          <p class="muted" style="font-size:.76rem;margin-top:12px">🔒 Ambiente de demonstração: nenhuma senha ou dado bancário é solicitado. No app real esta etapa redireciona para o aplicativo do ${b.name}.</p>
+          <p class="muted" style="font-size:.76rem;margin-top:12px">Ambiente de demonstração: nenhuma senha ou dado bancário é solicitado. No app real esta etapa redireciona para o aplicativo do ${b.name}.</p>
           <div class="modal-foot"><button class="btn btn-sm" data-of="back">Voltar</button><button class="btn btn-lime" data-of="ok">Autorizar no app do banco ${ARROW}</button></div>`;
       } else if (step === 2) {
         box.innerHTML = `${steps()}<div style="text-align:center;padding:20px 0"><div class="loader"></div><p class="display" style="font-size:1.2rem;margin-top:14px" id="ofMsg">Abrindo o app do ${b.name}…</p><p class="muted" style="font-size:.84rem;margin-top:6px">Isso leva só alguns segundos</p></div>`;
-        setTimeout(() => { const e = $('#ofMsg'); if (e) e.textContent = 'Autorizado ✓ Importando transações…'; }, 1100);
+        setTimeout(() => { const e = $('#ofMsg'); if (e) e.textContent = 'Autorizado Importando transações…'; }, 1100);
         setTimeout(finish, 2300);
       }
     };
@@ -1486,7 +1487,7 @@
         <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:16px">${Object.entries(counts).map(([c, k]) => `<span class="chip">${catIco(c)} ${cat(c).name} · ${k}</span>`).join('')}</div>
         <div class="modal-foot" style="justify-content:center"><button class="btn btn-sm" data-close>Fechar</button><button class="btn btn-lime" data-of="see">Ver transações ${ARROW}</button></div>`;
       render();
-      toast(`<b>${esc(b.name)}</b> conectado via Open Finance`, '🔗');
+      toast(`<b>${esc(b.name)}</b> conectado via Open Finance`);
     };
     const finish = async () => {
       if (!$('#ofBody')) return;
@@ -1525,6 +1526,144 @@
     draw();
   }
 
+  /* ------------------------------------------ importar extrato (OFX/CSV) */
+  /** Forma de pagamento provável a partir da descrição do extrato. */
+  const methodFromDesc = (desc, amount, isCard) => {
+    if (isCard) return 'credito';
+    if (/\bpix\b/i.test(desc)) return 'pix';
+    if (/\bted\b|\bdoc\b|transfer[eê]ncia|transf\b/i.test(desc)) return 'ted';
+    if (/boleto|pagamento de t[ií]tulo|pagto cobran/i.test(desc)) return 'boleto';
+    if (/saque|dinheiro/i.test(desc)) return 'dinheiro';
+    return amount > 0 ? 'ted' : 'debito';
+  };
+  const fmtDate = (s) => s.split('-').reverse().join('/');
+  const INVOICE_RE = /pagamento.*(fatura|cart)|pgto.*(fatura|cart)|pag(to)? fatura|fatura.*pag|pagamento recebido/i;
+
+  function importModal() {
+    let parsed = null, fileName = '';
+    const m = openModal({
+      title: 'Importar extrato ou fatura',
+      wide: true,
+      body: `<div id="impBody">
+          <label class="imp-drop" id="impDrop">
+            <input type="file" id="impFile" accept=".ofx,.csv,.txt,application/x-ofx,text/csv" hidden>
+            <b>Escolha o arquivo do seu banco</b>
+            <span>OFX ou CSV, baixado no app ou no site do banco. Você também pode arrastar o arquivo para cá.</span>
+          </label>
+          <details class="imp-help"><summary>Como baixar o extrato</summary>
+            <p>No app ou no internet banking, abra o extrato da conta (ou a fatura do cartão) e procure a opção de exportar, baixar ou compartilhar. Escolha o formato <b>OFX</b>, que funciona em quase todos os bancos (Itaú, Bradesco, Santander, Banco do Brasil, Caixa, Inter, C6, Mercado Pago). No Nubank, a fatura e o extrato da conta também podem ser exportados em CSV.</p>
+            <p>O arquivo é lido aqui no seu navegador. Nenhuma senha do banco é pedida e nada é enviado a outras empresas.</p>
+          </details>
+          <p class="auth-err" id="impErr" role="alert"></p>
+        </div>`,
+      foot: '<button class="btn btn-sm" data-close>Cancelar</button><button class="btn btn-lime" id="impGo" disabled>Importar</button>',
+    });
+    const body = $('#impBody', m), err = $('#impErr', m), go = $('#impGo', m);
+
+    const readFile = async (file) => {
+      err.textContent = '';
+      if (!file) return;
+      if (file.size > 8 * 1024 * 1024) { err.textContent = 'Arquivo grande demais. Exporte um período menor (até alguns meses).'; return; }
+      try {
+        parsed = window.FinaxisImport.parseStatement(await file.arrayBuffer(), file.name);
+        fileName = file.name;
+        preview();
+      } catch (e) { parsed = null; go.disabled = true; err.textContent = e.message; }
+    };
+    $('#impFile', m).addEventListener('change', (e) => readFile(e.target.files[0]));
+    const drop = $('#impDrop', m);
+    ['dragenter', 'dragover'].forEach((ev) => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.add('over'); }));
+    ['dragleave', 'drop'].forEach((ev) => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.remove('over'); }));
+    drop.addEventListener('drop', (e) => readFile(e.dataTransfer.files[0]));
+
+    // Destino: conta/cartão existente do mesmo banco, ou um novo
+    const destOptions = () => {
+      const isCard = parsed.kind === 'card';
+      const own = isCard ? S.cards.map((c) => ['c:' + c.id, `Cartão: ${c.name}`]) : S.accounts.map((a) => ['a:' + a.id, `Conta: ${a.name}`]);
+      const other = isCard ? S.accounts.map((a) => ['a:' + a.id, `Conta: ${a.name}`]) : S.cards.map((c) => ['c:' + c.id, `Cartão: ${c.name}`]);
+      const match = (isCard ? S.cards : S.accounts).find((x) => parsed.bank && x.bank === parsed.bank);
+      const sel = match ? (isCard ? 'c:' : 'a:') + match.id : isCard ? 'new:card' : 'new:account';
+      return [...own, [isCard ? 'new:card' : 'new:account', isCard ? 'Novo cartão' : 'Nova conta'], ...other, [isCard ? 'new:account' : 'new:card', isCard ? 'Nova conta' : 'Novo cartão']]
+        .map(([v, l]) => `<option value="${v}" ${v === sel ? 'selected' : ''}>${esc(l)}</option>`).join('');
+    };
+
+    const build = () => {
+      const dest = $('#impDest', m).value, invert = $('#impInv', m).checked;
+      const isCard = dest.startsWith('c:') || dest === 'new:card';
+      const seen = {};
+      return parsed.tx.map((r) => {
+        const amount = invert ? -r.amount : r.amount;
+        const key = r.fitid || `${r.date}|${r.amount}|${r.desc}`;
+        seen[key] = (seen[key] || 0) + 1;
+        return { ...r, amount, key: key + '#' + seen[key], method: methodFromDesc(r.desc, amount, isCard), isCard };
+      });
+    };
+
+    const preview = () => {
+      const isCard = parsed.kind === 'card';
+      const first = parsed.tx[0].date, last = parsed.tx[parsed.tx.length - 1].date;
+      const bankName = parsed.bank ? BANKS[parsed.bank].name : 'Banco não identificado';
+      body.innerHTML = `
+        <div class="imp-file"><b>${esc(fileName)}</b><span>${parsed.format} · ${isCard ? 'fatura de cartão' : 'extrato de conta'} · ${esc(bankName)}</span></div>
+        <div class="form-grid" style="margin-top:16px">
+          <div class="field"><label for="impDest">Importar para</label><select class="select" id="impDest">${destOptions()}</select></div>
+          <div class="field" id="impBankWrap"><label for="impBank">Banco</label><select class="select" id="impBank">${Object.entries(BANKS).filter(([k]) => k !== 'cash').map(([k, b]) => `<option value="${k}" ${k === parsed.bank ? 'selected' : ''}>${b.name}</option>`).join('')}<option value="other" ${parsed.bank ? '' : 'selected'}>Outro</option></select></div>
+          <label class="field full imp-check"><input type="checkbox" id="impInv" ${parsed.invert ? 'checked' : ''}> Compras aparecem como valores positivos no arquivo (inverter sinais)</label>
+          ${parsed.balance != null && !isCard ? `<label class="field full imp-check"><input type="checkbox" id="impBal" checked> Ajustar o saldo da conta para ${brlRaw(parsed.balance)}, como informado no arquivo</label>` : ''}
+        </div>
+        <div class="imp-sum" id="impSum"></div>
+        <div class="imp-list" id="impList"></div>
+        <p class="auth-err" id="impErr2" role="alert"></p>`;
+      const refresh = () => {
+        const rows = build();
+        const dest = $('#impDest', m).value;
+        $('#impBankWrap', m).style.display = dest.startsWith('new:') ? '' : 'none';
+        const existing = new Set(S.tx.map((t) => t.id));
+        const destId = dest.startsWith('new:') ? null : dest.slice(2);
+        const dup = destId ? rows.filter((r) => existing.has('im_' + window.FinaxisImport.hash(destId + '|' + r.key))).length : 0;
+        const inc = sum(rows.filter((r) => r.amount > 0), (r) => r.amount), out = -sum(rows.filter((r) => r.amount < 0), (r) => r.amount);
+        $('#impSum', m).innerHTML = `<div><span>Lançamentos</span><b>${rows.length}</b></div><div><span>Período</span><b>${fmtDate(first)} a ${fmtDate(last)}</b></div><div><span>Entradas</span><b class="pos">${brlRaw(inc)}</b></div><div><span>Saídas</span><b class="neg">${brlRaw(out)}</b></div>`;
+        $('#impList', m).innerHTML = rows.slice(-8).reverse().map((r) => `<div class="imp-row"><span>${fmtDate(r.date)}</span><span>${esc(r.desc)}</span><span>${METHODS[r.method].name}</span><b class="${r.amount > 0 ? 'pos' : ''}">${signed(r.amount)}</b></div>`).join('') + (rows.length > 8 ? `<p class="muted imp-more">e mais ${rows.length - 8} lançamentos</p>` : '');
+        go.disabled = false;
+        go.textContent = dup ? `Importar ${rows.length - dup} novos (${dup} já importados)` : `Importar ${rows.length} lançamentos`;
+        if (dup === rows.length) { go.disabled = true; go.textContent = 'Tudo já foi importado'; }
+      };
+      ['#impDest', '#impInv'].forEach((s) => $(s, m).addEventListener('change', refresh));
+      refresh();
+    };
+
+    go.addEventListener('click', () => {
+      if (!parsed) return;
+      let dest = $('#impDest', m).value;
+      const bank = $('#impBank', m).value;
+      const bankName = bank === 'other' ? 'Banco' : BANKS[bank].name;
+      if (dest === 'new:account') {
+        const a = { id: uid(), bank: bank === 'other' ? 'other' : bank, bankName: bank === 'other' ? 'Banco' : undefined, name: `Conta ${bankName}`, kind: 'corrente', initial: 0, connected: false };
+        S.accounts.push(a); dest = 'a:' + a.id;
+      } else if (dest === 'new:card') {
+        const c = { id: uid(), bank: bank === 'other' ? 'other' : bank, bankName: bank === 'other' ? 'Banco' : undefined, name: `Cartão ${bankName}`, brand: '', last4: parsed.last4 || '', limit: 0, dueDay: 10, accountId: (S.accounts.find((a) => a.bank === bank) || S.accounts[0]).id, connected: false };
+        S.cards.push(c); dest = 'c:' + c.id;
+      }
+      const destId = dest.slice(2), onCard = dest.startsWith('c:');
+      const existing = new Set(S.tx.map((t) => t.id));
+      let added = 0;
+      for (const r of build()) {
+        const id = 'im_' + window.FinaxisImport.hash(destId + '|' + r.key);
+        if (existing.has(id)) continue;
+        const invoice = INVOICE_RE.test(r.desc) && (onCard ? r.amount > 0 : r.amount < 0);
+        S.tx.push({ id, ts: Date.now(), date: r.date, desc: r.desc.slice(0, 200), amount: r.amount, cat: invoice ? 'fatura' : autoCat(r.desc, r.amount), method: onCard ? 'credito' : r.method, source: 'import', ...(onCard ? { cardId: destId } : { accountId: destId }) });
+        existing.add(id); added++;
+      }
+      const balBox = $('#impBal', m);
+      if (balBox && balBox.checked && !onCard) {
+        const acc = S.accounts.find((a) => a.id === destId);
+        if (acc) acc.initial = Math.round((parsed.balance - sum(S.tx.filter((t) => t.accountId === acc.id), (t) => t.amount)) * 100) / 100;
+      }
+      closeModal(); UI.ym = ymOf(parseD(parsed.tx[parsed.tx.length - 1].date)); commit();
+      toast(added ? `<b>${added} lançamentos importados.</b> Já estão categorizados; confira em Transações.` : 'Nenhum lançamento novo: esse período já tinha sido importado.', 6000);
+    });
+  }
+
   /* ------------------------------------------- Open Finance real (Pluggy) */
   const loadScript = (src) => new Promise((ok, fail) => {
     if (window.PluggyConnect) return ok();
@@ -1533,29 +1672,44 @@
     document.head.appendChild(s);
   });
 
-  async function pluggyConnect() {
+  /** Seus bancos reais entram pelo MeuPluggy: você autoriza cada banco lá (Open Finance) e o Finaxis importa tudo. */
+  const MEU_PLUGGY_ID = 200;
+  function meuPluggyGuide() {
+    openModal({
+      title: 'Conectar seus bancos',
+      body: `<ol class="mp-steps">
+          <li><b>Autorize seus bancos no MeuPluggy</b><p>Entre em meu.pluggy.ai com seu e-mail e adicione cada instituição: Nubank, Itaú, Bradesco, Santander, Banco do Brasil, Mercado Pago, Inter, Caixa e outras. A autorização é feita no app de cada banco, pelo Open Finance, e é só de leitura.</p><a class="btn btn-sm" href="https://meu.pluggy.ai" target="_blank" rel="noopener">Abrir o MeuPluggy</a></li>
+          <li><b>Traga tudo para o Finaxis</b><p>Depois, conecte o MeuPluggy aqui usando o mesmo e-mail. Contas, cartões, Pix, compras e salário de todos os bancos entram de uma vez e continuam atualizando sozinhos.</p></li>
+        </ol>`,
+      foot: '<button class="btn btn-sm" data-close>Agora não</button><button class="btn btn-lime" id="mpGo">Conectar MeuPluggy</button>',
+      onMount: (m) => $('#mpGo', m).addEventListener('click', () => { closeModal(); pluggyConnect(MEU_PLUGGY_ID); }),
+    });
+  }
+
+  async function pluggyConnect(connectorId) {
     try {
-      toast('Abrindo a conexão segura com o seu banco…', '🔒', 3000);
+      toast('Abrindo a conexão segura com o seu banco…', 3000);
       await loadScript(API.cfg.connectScript);
       const { data } = await api('POST', '/api/openfinance/connect-token');
       const widget = new window.PluggyConnect({
         connectToken: data.accessToken,
+        ...(connectorId ? { selectedConnectorId: connectorId } : {}),
         includeSandbox: !!API.cfg.sandbox,
         products: ['ACCOUNTS', 'CREDIT_CARDS', 'TRANSACTIONS', 'INVESTMENTS'],
         language: 'pt',
         onSuccess: async ({ item }) => {
-          toast('Banco autorizado! Importando suas transações…', '⏳', 4000);
+          toast('Banco autorizado! Importando suas transações…', 4000);
           try {
             const r = await api('POST', '/api/openfinance/items', { itemId: item.id });
             await refreshFromServer();
             render();
-            toast(`<b>${esc(r.data.connection.bankName || 'Banco')}</b> conectado: ${r.data.imported} transações importadas. Novas movimentações chegam automaticamente.`, '🔗', 7000);
-          } catch (e) { toast(`Não foi possível registrar a conexão: ${esc(e.message)}`, '⚠️', 7000); }
+            toast(`<b>${esc(r.data.connection.bankName || 'Banco')}</b> conectado: ${r.data.imported} transações importadas. Novas movimentações chegam automaticamente.`, 7000);
+          } catch (e) { toast(`Não foi possível registrar a conexão: ${esc(e.message)}`, 7000); }
         },
-        onError: (err) => toast(`O banco não concluiu a conexão${err && err.message ? `: ${esc(err.message)}` : ''}`, '⚠️', 7000),
+        onError: (err) => toast(`O banco não concluiu a conexão${err && err.message ? `: ${esc(err.message)}` : ''}`, 7000),
       });
       await widget.init();
-    } catch (e) { toast(esc(e.message), '⚠️', 6000); }
+    } catch (e) { toast(esc(e.message), 6000); }
   }
 
   /* ----------------------------------------------------- login / conta */
@@ -1693,7 +1847,7 @@
   function reminders() {
     if (!S.settings.reminders) return;
     const soon = upcoming(3).filter((b) => b.amount < 0 && b.kind !== 'save');
-    if (soon.length) setTimeout(() => toast(`<b>${soon.length} conta${soon.length > 1 ? 's vencem' : ' vence'} em até 3 dias</b><br>${soon.slice(0, 2).map((b) => esc(b.title)).join(', ')}${soon.length > 2 ? '…' : ''}`, '⏰', 6500), 1200);
+    if (soon.length) setTimeout(() => toast(`<b>${soon.length} conta${soon.length > 1 ? 's vencem' : ' vence'} em até 3 dias</b><br>${soon.slice(0, 2).map((b) => esc(b.title)).join(', ')}${soon.length > 2 ? '…' : ''}`, 6500), 1200);
   }
 
   /* --------------------------------------------------------- exportação */
@@ -1706,7 +1860,7 @@
     const rows = [['Data', 'Descrição', 'Categoria', 'Forma', 'Conta/Cartão', 'Valor']];
     [...S.tx].sort((a, b) => a.date.localeCompare(b.date)).forEach((t) => rows.push([t.date, t.desc, cat(t.cat).name, (METHODS[t.method] || {}).name || t.method, srcName(t), t.amount.toFixed(2).replace('.', ',')]));
     download('finaxis-transacoes.csv', '﻿' + rows.map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(';')).join('\n'), 'text/csv;charset=utf-8');
-    toast('CSV exportado (abre no Excel ou Google Sheets)', '⬇');
+    toast('CSV exportado (abre no Excel ou Google Sheets)');
   }
 
   /* -------------------------------------------------------------- ações */
@@ -1717,12 +1871,13 @@
     filterCat: (el) => { UI.f = { q: '', type: 'out', cat: el.dataset.cat, method: '', src: '' }; go('transacoes'); },
     ftype: (el) => { UI.f.type = el.dataset.v; $$('[data-act="ftype"]').forEach((b) => b.classList.toggle('on', b === el)); renderTxList(); },
     exportCsv, exportJson: () => download('finaxis-backup.json', JSON.stringify(S, null, 2), 'application/json'),
-    connectBank: () => (API.online && API.cfg && API.cfg.provider === 'pluggy' ? pluggyConnect() : connectBankModal()),
+    importStatement: () => importModal(),
+    connectBank: () => (API.online && API.cfg && API.cfg.provider === 'pluggy' ? meuPluggyGuide() : connectBankModal()),
     disconnectAcc: async (el) => {
       const a = [...S.accounts, ...S.cards].find((x) => x.id === el.dataset.id);
       if (!a || !a.connectionId) return;
       if (!confirm(`Desconectar ${bankOf(a).name}? O Finaxis deixa de receber novas transações desse banco (o histórico continua aqui).`)) return;
-      try { await api('DELETE', `/api/openfinance/connections/${a.connectionId}`); await refreshFromServer(); render(); toast(`${esc(bankOf(a).name)} desconectado. Consentimento revogado.`, '🔌'); } catch (e) { toast(esc(e.message), '⚠️'); }
+      try { await api('DELETE', `/api/openfinance/connections/${a.connectionId}`); await refreshFromServer(); render(); toast(`${esc(bankOf(a).name)} desconectado. Consentimento revogado.`); } catch (e) { toast(esc(e.message)); }
     },
     logout: () => logout(),
     deleteAccount: () => deleteAccountModal(),
@@ -1736,21 +1891,21 @@
         try {
           const { data } = await api('POST', '/api/openfinance/sync', { connectionId: a.connectionId });
           await refreshFromServer(); render();
-          toast(data.imported ? `${data.imported} novas transações de ${esc(bankOf(a).name)}` : `${esc(a.name)} sincronizada. Tudo em dia ✓`, '🔄');
-        } catch (e) { toast(`Falha ao sincronizar: ${esc(e.message)}`, '⚠️'); render(); }
+          toast(data.imported ? `${data.imported} novas transações de ${esc(bankOf(a).name)}` : `${esc(a.name)} sincronizada. Tudo em dia.`);
+        } catch (e) { toast(`Falha ao sincronizar: ${esc(e.message)}`); render(); }
         return;
       }
-      setTimeout(() => { a.lastSync = Date.now(); save(); render(); toast(`${esc(a.name)} sincronizada. Tudo em dia ✓`, '🔄'); }, 900);
+      setTimeout(() => { a.lastSync = Date.now(); save(); render(); toast(`${esc(a.name)} sincronizada. Tudo em dia.`); }, 900);
     },
     simulateLive: async () => {
-      try { await api('POST', '/api/openfinance/demo/tick'); } catch (e) { toast(e.status === 400 ? 'Conecte um banco de demonstração primeiro (botão Conectar banco).' : esc(e.message), '🔌'); }
+      try { await api('POST', '/api/openfinance/demo/tick'); } catch (e) { toast(e.status === 400 ? 'Conecte um banco de demonstração primeiro (botão Conectar banco).' : esc(e.message)); }
     },
     payInvoice: (el) => {
       const c = S.cards.find((x) => x.id === el.dataset.card), ym = el.dataset.ym, total = invoiceTotal(c, ym);
       const acc = S.accounts.find((a) => a.id === c.accountId) || S.accounts[0];
       if (!confirm(`Registrar pagamento da fatura ${c.name} de ${MONTHS[parseD(ym + '-01').getMonth()].toLowerCase()} (${brlRaw(total)}) saindo de ${acc.name}?`)) return;
       S.tx.push({ id: uid(), ts: Date.now(), date: todayStr(), desc: `Fatura ${c.name} (${ymShort(ym)})`, amount: -total, cat: 'fatura', method: 'boleto', accountId: acc.id, source: 'manual' });
-      S.paid[c.id + ':' + ym] = true; commit(); toast('Fatura paga! Limite liberado.', '✅');
+      S.paid[c.id + ':' + ym] = true; commit(); toast('Fatura paga! Limite liberado.');
     },
     newGoal: () => goalModal(), editGoal: (el) => goalModal(S.goals.find((g) => g.id === el.dataset.id)),
     goalMove: (el) => goalMoveModal(S.goals.find((g) => g.id === el.dataset.id), +el.dataset.dir),
@@ -1758,13 +1913,13 @@
     editBudgets: () => budgetsModal(),
     suggestBudgets: () => { const sg = {}; EXP_CATS.forEach((c) => { const v = avgExpenses(3, (k) => k === c); if (v > 20) sg[c] = Math.ceil((v * 0.9) / 10) * 10; }); budgetsModal(sg); },
     newRec: () => recModal(), editRec: (el) => recModal(S.recurring.find((r) => r.id === el.dataset.id)),
-    joinCh: (el) => { S.learn.challenges[el.dataset.id] = { joined: todayStr() }; commit(); toast('Desafio aceito! Bora 💪', '🔥'); },
-    doneCh: (el) => { const ch = CHALLENGES.find((c) => c.id === el.dataset.id); const st = S.learn.challenges[ch.id]; if (st.done) return; st.done = true; S.learn.xp += ch.xp; commit(); toast(`Desafio concluído: <b>+${ch.xp} XP</b>`, '🏆'); },
+    joinCh: (el) => { S.learn.challenges[el.dataset.id] = { joined: todayStr() }; commit(); toast('Desafio aceito! Bora '); },
+    doneCh: (el) => { const ch = CHALLENGES.find((c) => c.id === el.dataset.id); const st = S.learn.challenges[ch.id]; if (st.done) return; st.done = true; S.learn.xp += ch.xp; commit(); toast(`Desafio concluído: <b>+${ch.xp} XP</b>`); },
     openLesson: (el) => {
       const course = COURSES.find((c) => c.lessons.some((l) => l.id === el.dataset.id)), l = course.lessons.find((x) => x.id === el.dataset.id);
       const done = S.learn.done.includes(l.id);
-      openModal({ title: l.t, body: `<span class="tag" style="background:${course.color};color:#fff">${course.emoji} ${course.title}</span><div class="lesson-content" style="margin-top:14px">${l.body.map((p) => `<p>${esc(p)}</p>`).join('')}<div class="callout">💡 <b>Na prática:</b> ${esc(l.tip)}</div></div>`, foot: `<button class="btn btn-sm" data-close>Fechar</button>${done ? '<span class="chip" style="background:#3DBA85">Concluída ✓</span>' : '<button class="btn btn-lime" id="lDone">Concluir aula · +50 XP</button>'}`, onMount: (m) => {
-        const b = $('#lDone', m); if (b) b.addEventListener('click', () => { S.learn.done.push(l.id); S.learn.xp += 50; closeModal(); commit(); toast('Aula concluída: <b>+50 XP</b>', '🎓'); });
+      openModal({ title: l.t, body: `<span class="tag" style="background:${course.color};color:#fff">${course.title}</span><div class="lesson-content" style="margin-top:14px">${l.body.map((p) => `<p>${esc(p)}</p>`).join('')}<div class="callout"><b>Na prática:</b> ${esc(l.tip)}</div></div>`, foot: `<button class="btn btn-sm" data-close>Fechar</button>${done ? '<span class="chip" style="background:#3DBA85">Concluída </span>' : '<button class="btn btn-lime" id="lDone">Concluir aula · +50 XP</button>'}`, onMount: (m) => {
+        const b = $('#lDone', m); if (b) b.addEventListener('click', () => { S.learn.done.push(l.id); S.learn.xp += 50; closeModal(); commit(); toast('Aula concluída: <b>+50 XP</b>'); });
       } });
     },
     more: () => openModal({ title: 'Menu', body: `<nav class="side-nav more-sheet">${navHtml()}</nav>`, onMount: (m) => { $$('[data-route]', m).forEach((a) => { a.classList.toggle('active', a.dataset.route === UI.route); a.addEventListener('click', closeModal); }); } }),
@@ -1785,7 +1940,7 @@
         $('#oOk', m).addEventListener('click', () => {
           S.profile.name = $('#oName', m).value.trim() || 'Você'; S.profile.salary = +$('#oSal', m).value || 0; S.profile.payday = clamp(+$('#oDay', m).value || 5, 1, 31);
           if ($('#oRec', m).checked && S.profile.salary) { const T = now(); S.recurring.push({ id: uid(), desc: 'Salário', amount: S.profile.salary, cat: 'salario', day: S.profile.payday, method: 'ted', accountId: S.accounts[0].id, start: S.profile.payday < T.getDate() ? shiftYm(ymOf(T), 1) : ymOf(T) }); postRecurring(S); }
-          closeModal(); commit(); toast('Painel pronto! Agora conecte um banco ou lance seu primeiro gasto.', '🎉', 6000);
+          closeModal(); commit(); toast('Painel pronto! Agora conecte um banco ou lance seu primeiro gasto.', 6000);
         });
       } });
   }
@@ -1805,11 +1960,11 @@
     const f = e.target.closest('[data-filter]');
     if (f) { UI.f[f.dataset.filter] = f.value; renderTxList(); return; }
     const p = e.target.closest('[data-profile]');
-    if (p) { const k = p.dataset.profile; S.profile[k] = k === 'name' ? p.value : +p.value || 0; save(); if (k === 'name') $('#hello').textContent = `Olá, ${S.profile.name} 👋`; }
+    if (p) { const k = p.dataset.profile; S.profile[k] = k === 'name' ? p.value : +p.value || 0; save(); if (k === 'name') $('#hello').textContent = `Olá, ${S.profile.name} `; }
   });
   document.addEventListener('change', (e) => {
     const s = e.target.closest('[data-setting]');
-    if (s) { S.settings[s.dataset.setting] = s.checked; commit(); if (s.dataset.setting === 'live' && s.checked) toast('Tempo real ligado. Novas transações vão aparecer aqui.', '⚡'); }
+    if (s) { S.settings[s.dataset.setting] = s.checked; commit(); if (s.dataset.setting === 'live' && s.checked) toast('Tempo real ligado. Novas transações vão aparecer aqui.'); }
   });
   $('#monthSwitch').addEventListener('click', (e) => { const b = e.target.closest('[data-m]'); if (!b) return; UI.ym = shiftYm(UI.ym, +b.dataset.m); render(); });
   $('#addBtn').addEventListener('click', () => txModal());
@@ -1846,7 +2001,7 @@
     API.online = true;
     API.cfg = (await api('GET', '/api/openfinance/config')).data;
     await loadRemote();
-    if (postRecurring(S)) toast('Contas fixas do período foram lançadas automaticamente', '📅');
+    if (postRecurring(S)) toast('Contas fixas do período foram lançadas automaticamente');
     save();
     buildNav();
     sidePanel();

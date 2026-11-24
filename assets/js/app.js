@@ -1779,6 +1779,7 @@
 
   async function boot() {
     const params = new URLSearchParams(location.search);
+    const createAccountRequested = location.hash === '#criar';
     let googleErrorMessage = '';
     if (params.get('auth') === 'google' || params.has('google_error')) {
       if (params.has('google_error')) {
@@ -1789,6 +1790,13 @@
     }
     try { const r = await fetch('/api/health', { cache: 'no-store' }); API.available = r.ok && !!(await r.json()).ok; } catch (_) { API.available = false; }
     if (!API.available) throw new Error('servidor indisponível');
+    // A landing page's "Criar conta" CTA must never inherit the current browser session.
+    // This matters on shared devices, where another person may still be signed in.
+    if (createAccountRequested) {
+      await api('POST', '/api/auth/logout').catch(() => {});
+      showAuth(googleErrorMessage);
+      return;
+    }
     try { API.user = (await api('GET', '/api/me')).data.user; } catch (e) { if (e.status === 401) return showAuth(googleErrorMessage); throw e; }
     API.online = true;
     API.cfg = (await api('GET', '/api/openfinance/config')).data;

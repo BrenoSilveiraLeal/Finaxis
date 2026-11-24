@@ -1,5 +1,5 @@
 /* ==========================================================================
-   FINAXIS — app de controle financeiro (vanilla JS, dados no localStorage)
+   FINAXIS — app de controle financeiro (vanilla JS, dados salvos na conta do usuário)
    ========================================================================== */
 (() => {
   'use strict';
@@ -41,7 +41,6 @@
   const ARROW = '<img class="arrow" src="assets/img/arrow.svg" alt="">';
   const MASCOT = 'assets/img/logo.svg';
 
-  function mulberry32(a) { return function () { a |= 0; a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
 
   /* --------------------------------------------------------- catálogos */
   const CATS = {
@@ -341,99 +340,6 @@
       settings: { live: true, hide: false, reminders: true },
       recStart: ymOf(now()),
     };
-  }
-
-  function seedDemo() {
-    const T = now();
-    const rnd = mulberry32(20261107);
-    const pick = (a) => a[Math.floor(rnd() * a.length)];
-    const between = (a, b) => Math.round((a + rnd() * (b - a)) * 100) / 100;
-    const s = emptyState(true);
-    S = s; // autoCat precisa de S.learned
-    s.profile = { name: 'Ana', salary: 6200, payday: 5 };
-    s.recStart = shiftYm(ymOf(T), -5);
-    s.accounts = [
-      { id: 'a1', bank: 'nubank', name: 'Conta Nubank', kind: 'corrente', initial: 0, connected: true, lastSync: Date.now() },
-      { id: 'a2', bank: 'itau', name: 'Itaú Conta Corrente', kind: 'corrente', initial: 0, connected: true, lastSync: Date.now() },
-      { id: 'a3', bank: 'cash', name: 'Carteira', kind: 'dinheiro', initial: 0, connected: false },
-    ];
-    s.cards = [
-      { id: 'c1', bank: 'nubank', name: 'Nubank Ultravioleta', brand: 'Mastercard', last4: '4821', limit: 6000, dueDay: 10, accountId: 'a1', connected: true },
-      { id: 'c2', bank: 'itau', name: 'Itaú Click', brand: 'Visa', last4: '1934', limit: 3500, dueDay: 17, accountId: 'a2', connected: true },
-    ];
-    s.recurring = [
-      { id: 'r1', desc: 'Salário — Agência Lumen', amount: 6200, cat: 'salario', day: 5, method: 'ted', accountId: 'a1' },
-      { id: 'r2', desc: 'Aluguel — QuintoAndar', amount: -1450, cat: 'moradia', day: 10, method: 'boleto', accountId: 'a1' },
-      { id: 'r3', desc: 'Telefone Vivo', amount: -15, cat: 'contas', day: 15, method: 'credito', cardId: 'c1' },
-      { id: 'r4', desc: 'Netflix', amount: -44.9, cat: 'assinaturas', day: 8, method: 'credito', cardId: 'c1' },
-      { id: 'r5', desc: 'Spotify', amount: -21.9, cat: 'assinaturas', day: 12, method: 'credito', cardId: 'c2' },
-      { id: 'r6', desc: 'Internet Claro Fibra', amount: -99.9, cat: 'contas', day: 20, method: 'boleto', accountId: 'a2' },
-      { id: 'r7', desc: 'Smart Fit', amount: -119.9, cat: 'saude', day: 3, method: 'credito', cardId: 'c2' },
-      { id: 'r8', desc: 'Energia Enel', amount: -168.4, cat: 'contas', day: 22, method: 'pix', accountId: 'a2' },
-    ];
-    s.goals = [
-      { id: 'g1', name: 'Viagem para o Chile', emoji: '✈️', target: 8000, saved: 0, monthly: 500, rate: 10.5, color: '#D4553A', autoDay: 6, accountId: 'a1' },
-      { id: 'g2', name: 'Reserva de emergência', emoji: '🛟', target: 18000, saved: 0, monthly: 400, rate: 10.5, color: '#3DBA85', autoDay: 6, accountId: 'a1', kind: 'reserva' },
-      { id: 'g3', name: 'PlayStation 5', emoji: '🎮', target: 3800, saved: 0, monthly: 250, rate: 0, color: '#3E5C76' },
-    ];
-    s.budgets = { alimentacao: 650, mercado: 1100, transporte: 420, compras: 450, lazer: 300, assinaturas: 100, saude: 250 };
-
-    const M = {
-      mercado: ['Carrefour', 'Pão de Açúcar', 'Assaí Atacadista', 'Hortifruti Natural', 'Supermercado Dia'],
-      delivery: ['iFood *Burger King', 'iFood *Sushi Mia', 'iFood *Pizza Bella', 'Rappi *Açaí da Vila', 'iFood *Marmitaria Fit'],
-      comer: ['Padaria Real', 'Starbucks', 'Restaurante Sabor Caseiro', 'Outback Steakhouse', 'McDonald\'s'],
-      uber: ['Uber *Trip', 'Uber *Trip', '99 Pop', 'Uber *Trip'],
-      compras: ['Amazon.com.br', 'Mercado Livre', 'Shopee', 'Renner', 'Magalu'],
-      lazer: ['Cinemark', 'Bar do Zé', 'Ingresso Rápido', 'Steam'],
-      saude: ['Drogasil', 'Droga Raia'],
-      pix: ['Pix recebido — João P.', 'Pix recebido — Mãe', 'Pix recebido — Carla M.'],
-    };
-    const accFor = (method) => (method === 'credito' ? { cardId: rnd() < 0.68 ? 'c1' : 'c2' } : method === 'dinheiro' ? { accountId: 'a3' } : { accountId: rnd() < 0.6 ? 'a1' : 'a2' });
-
-    for (let back = 5; back >= 0; back--) {
-      const d0 = new Date(T.getFullYear(), T.getMonth() - back, 1);
-      const y = d0.getFullYear(), m = d0.getMonth(), dim = daysIn(y, m);
-      const maxDay = back === 0 ? T.getDate() : dim;
-      const scale = maxDay / dim;
-      const n = (base) => Math.max(back === 0 ? 0 : 1, Math.round(base * scale));
-      const add = (desc, amount, method) => {
-        const day = 1 + Math.floor(rnd() * maxDay);
-        s.tx.push({ id: uid(), date: ymd(new Date(y, m, day)), desc, amount, cat: autoCat(desc, amount), method, source: 'bank', ...accFor(method) });
-      };
-      for (let i = 0, k = n(4 + rnd() * 2); i < k; i++) add(pick(M.mercado), -between(85, 360), pick(['debito', 'credito', 'pix']));
-      const deliv = back === 0 ? 1.5 : 1;
-      for (let i = 0, k = n((5 + rnd() * 3) * deliv); i < k; i++) add(pick(M.delivery), -between(28, 78), 'credito');
-      for (let i = 0, k = n(3 + rnd() * 3); i < k; i++) add(pick(M.comer), -between(14, 120), pick(['debito', 'credito', 'dinheiro']));
-      for (let i = 0, k = n(6 + rnd() * 4); i < k; i++) add(pick(M.uber), -between(11, 46), 'credito');
-      if (rnd() < 0.8) add('Posto Shell', -between(140, 230), 'debito');
-      for (let i = 0, k = n(1 + rnd() * 3); i < k; i++) add(pick(M.compras), -between(45, 330), 'credito');
-      for (let i = 0, k = n(1 + rnd() * 2); i < k; i++) add(pick(M.lazer), -between(25, 140), pick(['credito', 'pix']));
-      if (rnd() < 0.7) add(pick(M.saude), -between(25, 110), 'debito');
-      if (rnd() < 0.7) add(pick(M.pix), between(40, 350), 'pix');
-      if (rnd() < 0.5 && back > 0) add('Freela design — Pix', between(600, 1500), 'pix');
-      if (back > 0) s.tx.push({ id: uid(), date: ymd(new Date(y, m, dim)), desc: 'Rendimento da conta', amount: between(12, 30), cat: 'rendimentos', method: 'ted', accountId: 'a1', source: 'bank' });
-    }
-
-    postRecurring(s);
-
-    // faturas pagas dos meses anteriores
-    for (let back = 5; back >= 1; back--) {
-      const ym = shiftYm(ymOf(T), -back);
-      for (const c of s.cards) {
-        const due = new Date(parseD(ym + '-01').getFullYear(), parseD(ym + '-01').getMonth() + 1, c.dueDay);
-        if (due > T) continue;
-        const total = invoiceTotal(c, ym, s);
-        if (total <= 0) continue;
-        s.tx.push({ id: uid(), date: ymd(due), desc: `Fatura ${c.name} (${ymShort(ym)})`, amount: -total, cat: 'fatura', method: 'boleto', accountId: c.accountId, source: 'bank' });
-        s.paid[c.id + ':' + ym] = true;
-      }
-    }
-
-    const targets = { a1: 2847.32, a2: 1563.9, a3: 180 };
-    for (const a of s.accounts) a.initial = Math.round((targets[a.id] - sum(s.tx.filter((t) => t.accountId === a.id), (t) => t.amount)) * 100) / 100;
-    s.goals[0].saved = 5680; s.goals[1].saved = 7200; s.goals[2].saved = 950;
-    s.learn = { done: ['l1', 'l2'], xp: 100, challenges: { ch2: { joined: ymd(new Date(T.getFullYear(), T.getMonth() - 1, 1)), progress: 4 } } };
-    return s;
   }
 
   /* ----------------------------------------------------- domínio/cálculo */
@@ -1211,7 +1117,7 @@
         
         <div style="flex:1;min-width:200px"><h3 class="display" style="font-size:1.2rem">${esc(API.user.name)}</h3><p class="muted" style="font-size:.86rem;margin-top:4px">${esc(API.user.email)} · Open Finance: ${API.cfg.provider === 'pluggy' ? 'Pluggy' + (API.cfg.webhooks ? ' com webhooks' : ' (sincroniza ao abrir e periodicamente)') : 'modo demonstração'}</p></div>
         <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn btn-sm" data-act="logout">Sair</button><button class="btn btn-sm btn-ghost neg" data-act="deleteAccount">Excluir minha conta</button></div>
-      </section>` : API.available ? `<section class="card span-2 cream" style="display:flex;gap:16px;align-items:center;flex-wrap:wrap"><div style="flex:1;min-width:220px"><h3 class="display" style="font-size:1.2rem">Modo local</h3><p class="muted" style="font-size:.86rem;margin-top:4px">Crie uma conta para salvar na nuvem, usar em vários dispositivos e conectar seus bancos.</p></div><button class="btn btn-lime btn-sm" data-act="goSignup">Criar conta</button></section>` : ''}
+      </section>` : ''}
       <section class="card">
         <div class="card-head"><h3>Seu perfil</h3></div>
         <div class="form-grid">
@@ -1228,11 +1134,10 @@
       </section>
       <section class="card cream">
         <div class="card-head"><h3>Seus dados</h3></div>
-        <p class="muted" style="font-size:.86rem;line-height:1.5;margin-bottom:14px">${API.online ? 'Seus dados ficam salvos na sua conta e sincronizados entre dispositivos.' : 'No modo local tudo fica salvo apenas neste navegador.'}${Object.keys(S.learned).length ? ` O app já aprendeu ${Object.keys(S.learned).length} regra(s) de categoria com você.` : ''}</p>
+        <p class="muted" style="font-size:.86rem;line-height:1.5;margin-bottom:14px">Seus dados ficam salvos na sua conta e sincronizados entre dispositivos.${Object.keys(S.learned).length ? ` O app já aprendeu ${Object.keys(S.learned).length} regra(s) de categoria com você.` : ''}</p>
         <div style="display:flex;gap:10px;flex-wrap:wrap">
           <button class="btn btn-sm" data-act="exportCsv">⬇ Exportar CSV</button>
           <button class="btn btn-sm" data-act="exportJson">⬇ Backup (JSON)</button>
-          <button class="btn btn-sm btn-lime" data-act="resetDemo">↺ Recarregar demo</button>
           <button class="btn btn-sm btn-red" data-act="startEmpty">Começar do zero</button>
         </div>
       </section>
@@ -1680,7 +1585,6 @@
             <p class="neg" id="aErr" role="alert" style="font-size:.85rem;font-weight:700;min-height:1em">${msg ? esc(msg) : ''}</p>
             <button class="btn btn-lime btn-lg" id="aSubmit" type="submit">Entrar ${ARROW}</button>
           </form>
-          <button class="link" id="authLocal" style="margin-top:18px;display:block">Explorar sem conta (dados de exemplo só neste navegador)</button>
         </div>
       </section>`;
     document.body.appendChild(root);
@@ -1705,11 +1609,11 @@
         const body = { email: $('#aEmail', root).value, password: $('#aPass', root).value };
         if (mode === 'signup') body.name = $('#aName2', root).value;
         await api('POST', mode === 'signup' ? '/api/auth/signup' : '/api/auth/login', body);
-        try { sessionStorage.removeItem('finaxis.local'); } catch (_) { /* ignore */ }
+        history.replaceState(null, '', location.pathname);
         location.reload();
       } catch (err) { $('#aErr', root).textContent = err.message; btn.disabled = false; }
     });
-    $('#authLocal', root).addEventListener('click', () => { try { sessionStorage.setItem('finaxis.local', '1'); } catch (_) { /* ignore */ } location.reload(); });
+    if (location.hash === '#criar') setMode('signup');
     setTimeout(() => $('#aEmail', root).focus(), 50);
   }
 
@@ -1739,35 +1643,6 @@
     next.cards = [...next.cards.filter((c) => !isBankId(c.id)), ...prev.cards.filter((c) => isBankId(c.id))];
     next.tx = [...next.tx, ...prev.tx.filter((t) => isBankId(t.id))];
     return next;
-  }
-
-  /* ------------------------------------------------- tempo real (demo) */
-  const LIVE_POOL = [
-    ['iFood *Hamburgueria Brasa', [32, 68], 'credito'], ['Uber *Trip', [12, 39], 'credito'], ['99 Pop', [9, 28], 'credito'],
-    ['Carrefour Express', [18, 95], 'debito'], ['Starbucks', [16, 34], 'credito'], ['Drogasil', [22, 80], 'debito'],
-    ['Amazon.com.br', [39, 210], 'credito'], ['Padaria Real', [9, 30], 'pix'], ['Pix recebido — Carla M.', [25, 180], 'pix'],
-    ['Mercado Livre', [45, 260], 'credito'], ['Rappi *Açaí da Vila', [22, 41], 'credito'], ['Shell Box', [80, 190], 'debito'],
-  ];
-  function liveTick(force) {
-    if (!force && (!S.settings.live || document.hidden)) return;
-    const accs = S.accounts.filter((a) => a.connected), cards = S.cards.filter((c) => c.connected);
-    if (!accs.length && !cards.length) { if (force) toast('Conecte um banco primeiro para receber transações ao vivo.', '🔌'); return; }
-    const [desc, [lo, hi], meth0] = LIVE_POOL[Math.floor(Math.random() * LIVE_POOL.length)];
-    const income = /recebido/i.test(desc);
-    let meth = meth0;
-    if (meth === 'credito' && !cards.length) meth = 'debito';
-    if (meth !== 'credito' && !accs.length) meth = 'credito';
-    const v = Math.round((lo + Math.random() * (hi - lo)) * 100) / 100;
-    const src = meth === 'credito' ? { cardId: cards[Math.floor(Math.random() * cards.length)].id } : { accountId: accs[Math.floor(Math.random() * accs.length)].id };
-    const t = { id: uid(), ts: Date.now(), date: todayStr(), desc, amount: income ? v : -v, cat: autoCat(desc, income ? 1 : -1), method: meth, source: 'live', ...src };
-    S.tx.push(t); UI.fresh.add(t.id);
-    accs.forEach((a) => { a.lastSync = Date.now(); });
-    save();
-    const bank = srcBank(t);
-    toast(`<b>${income ? 'Pix recebido' : meth === 'credito' ? 'Compra no crédito' : 'Novo gasto'}</b> · ${esc(bank.name)}<br>${esc(desc)} ${signed(t.amount)} → ${cat(t.cat).emoji} ${cat(t.cat).name}`, income ? '💸' : '💳', 5500);
-    if (!income) budgetCheck(t.cat);
-    const busy = document.activeElement && document.activeElement.closest && document.activeElement.closest('#view input, #view select');
-    if (!busy && !$('#modalRoot').children.length && ['painel', 'transacoes', 'contas', 'orcamentos', 'relatorios'].includes(UI.route)) { UI.ym = ymOf(now()); render(); }
   }
 
   function reminders() {
@@ -1805,7 +1680,6 @@
       try { await api('DELETE', `/api/openfinance/connections/${a.connectionId}`); await refreshFromServer(); render(); toast(`${esc(bankOf(a).name)} desconectado. Consentimento revogado.`, '🔌'); } catch (e) { toast(esc(e.message), '⚠️'); }
     },
     logout: () => logout(),
-    goSignup: () => { try { sessionStorage.removeItem('finaxis.local'); } catch (_) { /* ignore */ } location.reload(); },
     deleteAccount: () => deleteAccountModal(),
     newCard: () => cardModal(), editCard: (el) => cardModal(S.cards.find((c) => c.id === el.dataset.id)),
     newAccount: () => accountModal(), editAcc: (el) => accountModal(S.accounts.find((a) => a.id === el.dataset.id)),
@@ -1824,7 +1698,6 @@
       setTimeout(() => { a.lastSync = Date.now(); save(); render(); toast(`${esc(a.name)} sincronizada. Tudo em dia ✓`, '🔄'); }, 900);
     },
     simulateLive: async () => {
-      if (!API.online) return liveTick(true);
       try { await api('POST', '/api/openfinance/demo/tick'); } catch (e) { toast(e.status === 400 ? 'Conecte um banco de demonstração primeiro (botão Conectar banco).' : esc(e.message), '🔌'); }
     },
     payInvoice: (el) => {
@@ -1850,7 +1723,6 @@
       } });
     },
     more: () => openModal({ title: 'Menu', body: `<nav class="side-nav more-sheet">${navHtml()}</nav>`, onMount: (m) => { $$('[data-route]', m).forEach((a) => { a.classList.toggle('active', a.dataset.route === UI.route); a.addEventListener('click', closeModal); }); } }),
-    resetDemo: () => { if (!confirm('Recarregar os dados de demonstração? Suas alterações serão perdidas.')) return; const prev = S; S = keepBankData(seedDemo(), prev); UI.ym = ymOf(now()); commit(); toast('Demo recarregada', '↺'); },
     startEmpty: () => {
       if (!confirm(`Apagar todos os dados${API.online ? ' (exceto o que vem dos bancos conectados)' : ''} e começar do zero?`)) return;
       const prev = S; S = keepBankData(emptyState(false), prev); UI.ym = ymOf(now()); commit(); onboarding();
@@ -1863,13 +1735,8 @@
       <div class="field"><label for="oSal">Salário líquido</label><div class="input-money"><input class="input" id="oSal" type="number" min="0" step="50"></div></div>
       <div class="field"><label for="oDay">Dia em que recebe</label><input class="input" id="oDay" type="number" min="1" max="31" value="5"></div>
       <label class="field full" style="flex-direction:row;gap:10px;align-items:center;font-size:.85rem"><input type="checkbox" id="oRec" checked> Lançar o salário automaticamente todo mês</label></div>`,
-      foot: `<button class="btn btn-sm btn-ghost" id="oDemo" style="margin-right:auto">Ver com dados de exemplo</button><button class="btn btn-sm" data-close>Depois</button><button class="btn btn-lime" id="oOk">Montar meu painel ${ARROW}</button>`, onMount: (m) => {
+      foot: `<button class="btn btn-sm" data-close>Depois</button><button class="btn btn-lime" id="oOk">Montar meu painel ${ARROW}</button>`, onMount: (m) => {
         if (S.profile.name && S.profile.name !== 'Você') $('#oName', m).value = S.profile.name;
-        $('#oDemo', m).addEventListener('click', () => {
-          const name = $('#oName', m).value.trim() || S.profile.name;
-          const prev = S; S = keepBankData(seedDemo(), prev); S.profile.name = name;
-          closeModal(); UI.ym = ymOf(now()); commit(); toast('Carreguei 6 meses de dados de exemplo. Em Ajustes você pode zerar quando quiser.', '✨', 6000);
-        });
         $('#oOk', m).addEventListener('click', () => {
           S.profile.name = $('#oName', m).value.trim() || 'Você'; S.profile.salary = +$('#oSal', m).value || 0; S.profile.payday = clamp(+$('#oDay', m).value || 5, 1, 31);
           if ($('#oRec', m).checked && S.profile.salary) { const T = now(); S.recurring.push({ id: uid(), desc: 'Salário', amount: S.profile.salary, cat: 'salario', day: S.profile.payday, method: 'ted', accountId: S.accounts[0].id, start: S.profile.payday < T.getDate() ? shiftYm(ymOf(T), 1) : ymOf(T) }); postRecurring(S); }
@@ -1908,45 +1775,33 @@
   function sidePanel() {
     const box = $('.side-promo'); if (!box) return;
     if (API.online) box.innerHTML = `<b>${esc(API.user.name)}</b><p>${esc(API.user.email)}<br>Dados salvos na sua conta${API.cfg && API.cfg.provider === 'demo' ? ' · bancos em modo demonstração' : ''}.</p><button class="link" data-act="logout" style="margin-top:8px">Sair</button>`;
-    else if (API.available) box.innerHTML = '<b>Modo local</b><p>Dados de exemplo só neste navegador.</p><button class="link" data-act="goSignup" style="margin-top:8px">Criar conta e salvar</button>';
   }
 
   async function boot() {
-    const shot = new URLSearchParams(location.search).has('shot'); // ?shot = captura de tela limpa
     const params = new URLSearchParams(location.search);
     let googleErrorMessage = '';
     if (params.get('auth') === 'google' || params.has('google_error')) {
-      try { sessionStorage.removeItem('finaxis.local'); } catch (_) { /* ignore */ }
       if (params.has('google_error')) {
         const messages = { not_configured: 'Login Google ainda não configurado no servidor.', cancelled: 'Login Google cancelado.', invalid_state: 'A tentativa expirou. Tente entrar com Google novamente.', token_exchange: 'O Google não concluiu a autenticação. Tente novamente.', invalid_identity: 'Não foi possível validar sua conta Google.', authentication_failed: 'Falha no login Google. Tente novamente.' };
         googleErrorMessage = messages[params.get('google_error')] || 'Não foi possível entrar com Google.';
-        history.replaceState(null, '', location.pathname);
-      } else history.replaceState(null, '', location.pathname);
+      }
+      history.replaceState(null, '', location.pathname);
     }
-    let localChosen = false;
-    try { localChosen = sessionStorage.getItem('finaxis.local') === '1'; } catch (_) { /* ignore */ }
-    if (!shot && location.protocol.startsWith('http')) {
-      try { const r = await fetch('/api/health', { cache: 'no-store' }); API.available = r.ok && !!(await r.json()).ok; } catch (_) { API.available = false; }
-    }
-    if (API.available && !localChosen) {
-      try { API.user = (await api('GET', '/api/me')).data.user; } catch (e) { if (e.status === 401) return showAuth(googleErrorMessage); throw e; }
-      API.online = true;
-      API.cfg = (await api('GET', '/api/openfinance/config')).data;
-      await loadRemote();
-    } else {
-      S = load();
-      if (!S || !S.v) S = seedDemo();
-    }
+    try { const r = await fetch('/api/health', { cache: 'no-store' }); API.available = r.ok && !!(await r.json()).ok; } catch (_) { API.available = false; }
+    if (!API.available) throw new Error('servidor indisponível');
+    try { API.user = (await api('GET', '/api/me')).data.user; } catch (e) { if (e.status === 401) return showAuth(googleErrorMessage); throw e; }
+    API.online = true;
+    API.cfg = (await api('GET', '/api/openfinance/config')).data;
+    await loadRemote();
     if (postRecurring(S)) toast('Contas fixas do período foram lançadas automaticamente', '📅');
     save();
     buildNav();
     sidePanel();
     route();
-    if (shot) { $('#toasts').style.display = 'none'; return; }
     reminders();
-    if (API.online) { connectEvents(); if (API.isNew) onboarding(); }
-    else { setTimeout(() => liveTick(), 20000); setInterval(() => liveTick(), 50000); }
-    window.addEventListener('beforeunload', () => { if (API.online && (API.dirty || API.saving)) { clearTimeout(API.timer); pushState(); } });
+    connectEvents();
+    if (API.isNew) onboarding();
+    window.addEventListener('beforeunload', () => { if (API.dirty || API.saving) { clearTimeout(API.timer); pushState(); } });
   }
   boot().catch((e) => {
     console.error(e);

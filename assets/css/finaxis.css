@@ -544,7 +544,7 @@ body.auth-open .app, body.auth-open .bottom-nav { display: none; }
   .auth-art { padding: 18px 36px; gap: 12px; }
   .auth-art h1 { font-size: clamp(1.55rem, 4vh, 2.1rem); margin-bottom: 12px; }
   .auth-art ul { gap: 7px; font-size: .88rem; }
-  .auth-mascot { width: clamp(84px, 12vw, 150px); max-height: 17vh; }
+  .auth-mascot { width: clamp(144px, 18vw, 200px); max-height: 25vh; }
   .auth-panel { padding: 10px 16px; }
   .auth-card { padding: 16px 20px; max-height: calc(var(--vh, 100vh) - 20px); overflow-y: auto; }
   .auth-card .seg { margin-bottom: 10px !important; }

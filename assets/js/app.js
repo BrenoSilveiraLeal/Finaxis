@@ -1564,57 +1564,102 @@
     let mode = 'login';
     const root = document.createElement('div');
     root.className = 'auth';
+    const rows = [
+      ['Pão de Açúcar', 'Débito', 'Mercado', 'var(--steel)', '−R$ 186,40'],
+      ['Uber', 'Crédito', 'Transporte', 'var(--amber)', '−R$ 23,90'],
+      ['Pix de Marina S.', 'Pix', 'Entrada', 'var(--emerald)', '+R$ 150,00'],
+      ['Drogasil', 'Débito', 'Saúde', 'var(--coral)', '−R$ 48,70'],
+      ['Spotify', 'Crédito', 'Assinaturas', '#7A8F88', '−R$ 21,90'],
+    ];
     root.innerHTML = `
-      <section class="auth-art">
-        <a href="index.html" class="brand" aria-label="Finaxis — página inicial"><img src="${MASCOT}" alt=""><span class="brand-word" style="color:#fff">Finaxis</span></a>
-        <div>
-          <h1 class="display">Seu dinheiro sob <span class="serif">controle</span>, em tempo real</h1>
-          <ul><li>Bancos e cartões conectados via Open Finance</li><li>Gastos categorizados sozinhos</li><li>Caixinhas com simulação de metas</li></ul>
+      <section class="auth-art" aria-hidden="true">
+        <a href="index.html" class="brand" tabindex="-1"><img src="${MASCOT}" alt=""><span class="brand-word">Finaxis</span></a>
+        <div class="auth-ledger">
+          <div class="al-head"><span>Hoje</span><span>5 lançamentos</span></div>
+          ${rows.map(([n, how, c, col, v], i) => `<div class="al-row" style="--i:${i}"><div><b>${n}</b><small>${how}</small></div><span class="al-cat" style="--c:${col}">${c}</span><span class="al-val${v[0] === '+' ? ' in' : ''}">${v}</span></div>`).join('')}
         </div>
-        <img class="auth-mascot" src="${MASCOT}" alt="">
+        <div class="auth-copy">
+          <h1>Seu extrato, já organizado.</h1>
+          <p>O Finaxis lê suas contas pelo Open Finance e coloca cada lançamento na categoria certa. O acesso é só de leitura e você revoga quando quiser.</p>
+        </div>
       </section>
       <section class="auth-panel">
-        <div class="card auth-card">
-          <div class="seg" id="authTabs" style="margin-bottom:20px"><button type="button" data-m="login" class="on">Entrar</button><button type="button" data-m="signup">Criar conta</button></div>
-          <button class="btn auth-google" id="authGoogle" type="button"><svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#4285F4" d="M43.6 24.5c0-1.4-.1-2.8-.4-4.1H24v7.8h11a9.4 9.4 0 0 1-4.1 6.2v5.1h6.7c3.9-3.6 6-8.8 6-15Z"/><path fill="#34A853" d="M24 44c5.5 0 10.2-1.8 13.6-4.9l-6.7-5.1c-1.8 1.2-4.1 1.9-6.9 1.9-5.3 0-9.8-3.6-11.4-8.4H5.7v5.3A20 20 0 0 0 24 44Z"/><path fill="#FBBC05" d="M12.6 27.5a12 12 0 0 1 0-7v-5.3H5.7a20 20 0 0 0 0 17.6l6.9-5.3Z"/><path fill="#EA4335" d="M24 12.1c3 0 5.7 1 7.8 3.1l5.9-5.9C34.2 6 29.5 4 24 4A20 20 0 0 0 5.7 15.2l6.9 5.3c1.6-4.8 6.1-8.4 11.4-8.4Z"/></svg>Continuar com Google</button>
-          <div class="auth-divider"><span>ou entre com e-mail</span></div>
-          <form id="authForm" class="stack" style="gap:14px" novalidate>
-            <div class="field" id="fName" hidden><label for="aName2">Seu nome</label><input class="input" id="aName2" autocomplete="name" maxlength="60"></div>
-            <div class="field"><label for="aEmail">E-mail</label><input class="input" id="aEmail" type="email" autocomplete="email" required></div>
-            <div class="field"><label for="aPass">Senha</label><input class="input" id="aPass" type="password" autocomplete="current-password" minlength="8" required><span class="hint" id="aHint" hidden>Mínimo de 8 caracteres</span></div>
-            <p class="neg" id="aErr" role="alert" style="font-size:.85rem;font-weight:700;min-height:1em">${msg ? esc(msg) : ''}</p>
-            <button class="btn btn-lime btn-lg" id="aSubmit" type="submit">Entrar ${ARROW}</button>
+        <div class="auth-form-wrap">
+          <a href="index.html" class="brand auth-brand-sm" aria-label="Finaxis — página inicial"><img src="${MASCOT}" alt=""><span class="brand-word">Finaxis</span></a>
+          <h2 id="aTitle">Entrar no Finaxis</h2>
+          <p class="auth-switch"><span id="aAsk">Ainda não tem conta?</span> <button type="button" class="link" id="aToggle">Criar conta grátis</button></p>
+          <button class="auth-google" id="authGoogle" type="button"><svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#4285F4" d="M43.6 24.5c0-1.4-.1-2.8-.4-4.1H24v7.8h11a9.4 9.4 0 0 1-4.1 6.2v5.1h6.7c3.9-3.6 6-8.8 6-15Z"/><path fill="#34A853" d="M24 44c5.5 0 10.2-1.8 13.6-4.9l-6.7-5.1c-1.8 1.2-4.1 1.9-6.9 1.9-5.3 0-9.8-3.6-11.4-8.4H5.7v5.3A20 20 0 0 0 24 44Z"/><path fill="#FBBC05" d="M12.6 27.5a12 12 0 0 1 0-7v-5.3H5.7a20 20 0 0 0 0 17.6l6.9-5.3Z"/><path fill="#EA4335" d="M24 12.1c3 0 5.7 1 7.8 3.1l5.9-5.9C34.2 6 29.5 4 24 4A20 20 0 0 0 5.7 15.2l6.9 5.3c1.6-4.8 6.1-8.4 11.4-8.4Z"/></svg><span>Continuar com Google</span></button>
+          <div class="auth-divider" id="aDivider"><span>ou com e-mail</span></div>
+          <form id="authForm" class="auth-form" novalidate>
+            <div class="field" id="fName" hidden><label for="aName2">Nome</label><input class="input" id="aName2" autocomplete="name" maxlength="60" placeholder="Como quer ser chamado"></div>
+            <div class="field"><label for="aEmail">E-mail</label><input class="input" id="aEmail" type="email" autocomplete="email" inputmode="email" required placeholder="voce@email.com"></div>
+            <div class="field"><label for="aPass">Senha</label>
+              <div class="pass-wrap"><input class="input" id="aPass" type="password" autocomplete="current-password" minlength="8" required><button type="button" class="pass-toggle" id="aEye" aria-controls="aPass" aria-pressed="false">Mostrar</button></div>
+              <span class="hint" id="aHint" hidden>Use pelo menos 8 caracteres.</span>
+            </div>
+            <p class="auth-err" id="aErr" role="alert">${msg ? esc(msg) : ''}</p>
+            <button class="btn btn-lime btn-lg" id="aSubmit" type="submit">Entrar</button>
           </form>
+          <p class="auth-note" id="aNote" hidden>Nenhuma senha de banco é pedida aqui. A conexão com o seu banco é autorizada depois, no app do próprio banco.</p>
         </div>
       </section>`;
     document.body.appendChild(root);
     const googleButton = $('#authGoogle', root);
+    const divider = $('#aDivider', root);
     googleButton.addEventListener('click', () => { location.href = '/api/auth/google'; });
-    fetch('/api/auth/providers', { cache: 'no-store' }).then((r) => r.json()).then((p) => { googleButton.hidden = !p.google; }).catch(() => { googleButton.hidden = true; });
+    fetch('/api/auth/providers', { cache: 'no-store' }).then((r) => r.json()).then((p) => { googleButton.hidden = !p.google; divider.hidden = !p.google; }).catch(() => { googleButton.hidden = true; divider.hidden = true; });
+    const err = $('#aErr', root);
     const setMode = (m) => {
       mode = m;
-      $$('#authTabs button', root).forEach((b) => b.classList.toggle('on', b.dataset.m === m));
-      $('#fName', root).hidden = m !== 'signup';
-      $('#aHint', root).hidden = m !== 'signup';
-      $('#aPass', root).autocomplete = m === 'signup' ? 'new-password' : 'current-password';
-      $('#aSubmit', root).innerHTML = `${m === 'signup' ? 'Criar minha conta' : 'Entrar'} ${ARROW}`;
-      $('#aErr', root).textContent = '';
+      const up = m === 'signup';
+      $('#aTitle', root).textContent = up ? 'Criar sua conta' : 'Entrar no Finaxis';
+      $('#aAsk', root).textContent = up ? 'Já tem conta?' : 'Ainda não tem conta?';
+      $('#aToggle', root).textContent = up ? 'Entrar' : 'Criar conta grátis';
+      $('#fName', root).hidden = !up;
+      $('#aHint', root).hidden = !up;
+      $('#aNote', root).hidden = !up;
+      $('#aPass', root).autocomplete = up ? 'new-password' : 'current-password';
+      $('#aSubmit', root).textContent = up ? 'Criar conta' : 'Entrar';
+      err.textContent = '';
+      $$('.input', root).forEach((i) => i.removeAttribute('aria-invalid'));
+      (up ? $('#aName2', root) : $('#aEmail', root)).focus();
     };
-    $('#authTabs', root).addEventListener('click', (e) => { const b = e.target.closest('[data-m]'); if (b) setMode(b.dataset.m); });
+    $('#aToggle', root).addEventListener('click', () => setMode(mode === 'signup' ? 'login' : 'signup'));
+    $('#aEye', root).addEventListener('click', (e) => {
+      const input = $('#aPass', root), show = input.type === 'password';
+      input.type = show ? 'text' : 'password';
+      e.currentTarget.textContent = show ? 'Ocultar' : 'Mostrar';
+      e.currentTarget.setAttribute('aria-pressed', String(show));
+    });
+    const invalid = (sel, text) => { const el = $(sel, root); el.setAttribute('aria-invalid', 'true'); el.focus(); err.textContent = text; return false; };
+    const validate = () => {
+      $$('.input', root).forEach((i) => i.removeAttribute('aria-invalid'));
+      if (mode === 'signup' && !$('#aName2', root).value.trim()) return invalid('#aName2', 'Informe seu nome.');
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test($('#aEmail', root).value.trim())) return invalid('#aEmail', 'Digite um e-mail válido, como voce@email.com.');
+      if (!$('#aPass', root).value) return invalid('#aPass', 'Digite sua senha.');
+      if (mode === 'signup' && $('#aPass', root).value.length < 8) return invalid('#aPass', 'A senha precisa ter pelo menos 8 caracteres.');
+      return true;
+    };
     $('#authForm', root).addEventListener('submit', async (e) => {
       e.preventDefault();
+      if (!validate()) return;
       const btn = $('#aSubmit', root);
       btn.disabled = true;
+      btn.textContent = mode === 'signup' ? 'Criando conta…' : 'Entrando…';
       try {
-        const body = { email: $('#aEmail', root).value, password: $('#aPass', root).value };
-        if (mode === 'signup') body.name = $('#aName2', root).value;
+        const body = { email: $('#aEmail', root).value.trim(), password: $('#aPass', root).value };
+        if (mode === 'signup') body.name = $('#aName2', root).value.trim();
         await api('POST', mode === 'signup' ? '/api/auth/signup' : '/api/auth/login', body);
         history.replaceState(null, '', location.pathname);
         location.reload();
-      } catch (err) { $('#aErr', root).textContent = err.message; btn.disabled = false; }
+      } catch (ex) {
+        err.textContent = ex.message;
+        btn.disabled = false;
+        btn.textContent = mode === 'signup' ? 'Criar conta' : 'Entrar';
+      }
     });
     if (location.hash === '#criar') setMode('signup');
-    setTimeout(() => $('#aEmail', root).focus(), 50);
+    setTimeout(() => $(mode === 'signup' ? '#aName2' : '#aEmail', root).focus(), 50);
   }
 
   async function logout() {

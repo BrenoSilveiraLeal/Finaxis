@@ -34,6 +34,10 @@ function readBody(req, limit = 5 * 1024 * 1024) {
 }
 
 async function readJson(req, limit) {
+  if (req.body && typeof req.body === 'object') return req.body;
+  if (typeof req.body === 'string') {
+    try { return JSON.parse(req.body); } catch { throw new HttpError(400, 'JSON inválido'); }
+  }
   const buf = await readBody(req, limit);
   if (!buf.length) return {};
   try { return JSON.parse(buf.toString('utf8')); } catch { throw new HttpError(400, 'JSON inválido'); }
@@ -62,7 +66,7 @@ function safeEqual(a, b) {
 const sha256 = (s) => crypto.createHash('sha256').update(s).digest('hex');
 const randomId = (bytes = 12) => crypto.randomBytes(bytes).toString('base64url');
 const isoDate = (ms) => new Date(ms).toISOString().slice(0, 10);
-const clientIp = (req) => (process.env.TRUST_PROXY === 'true' && String(req.headers['x-forwarded-for'] || '').split(',')[0].trim()) || req.socket.remoteAddress || '?';
+const clientIp = (req) => (process.env.TRUST_PROXY === 'true' && String(req.headers['x-forwarded-for'] || '').split(',')[0].trim()) || req.socket?.remoteAddress || '?';
 
 /** Limitador simples em memória (janela deslizante por chave). */
 function rateLimiter(max, windowMs) {

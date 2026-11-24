@@ -36,34 +36,36 @@ function createAuth(db) {
     delSess: db.prepare('DELETE FROM sessions WHERE token_hash = ?'),
     purge: db.prepare('DELETE FROM sessions WHERE expires_at < ?'),
     delUser: db.prepare('DELETE FROM users WHERE id = ?'),
+    accountBySubject: db.prepare('SELECT user_id FROM auth_accounts WHERE provider = ? AND subject = ?'),
+    insAccount: db.prepare('INSERT INTO auth_accounts (provider, subject, user_id, created_at) VALUES (?, ?, ?, ?)'),
   };
   const ipLimit = rateLimiter(30, 15 * 60 * 1000);
   const emailLimit = rateLimiter(8, 15 * 60 * 1000);
-  setInterval(() => q.purge.run(Date.now()), 60 * 60 * 1000).unref();
+  if (!process.env.VERCEL) setInterval(() => Promise.resolve(q.purge.run(Date.now())).catch(() => {}), 60 * 60 * 1000).unref();
 
-  const secureCookie = (req) => process.env.COOKIE_SECURE === 'true' || (process.env.TRUST_PROXY === 'true' && req.headers['x-forwarded-proto'] === 'https');
+  const secureCookie = (req) => process.env.COOKIE_SECURE === 'true' || process.env.VERCEL === '1' || (process.env.TRUST_PROXY === 'true' && req.headers['x-forwarded-proto'] === 'https');
 
   function sessionCookie(req, token, maxAgeSec) {
     return `${COOKIE}=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${maxAgeSec}${secureCookie(req) ? '; Secure' : ''}`;
   }
 
-  function createSession(req, userId) {
+  async function createSession(req, userId) {
     const token = randomId(32);
     const now = Date.now();
-    q.insSess.run(sha256(token), userId, now, now + SESSION_DAYS * 86400000);
+    await q.insSess.run(sha256(token), userId, now, now + SESSION_DAYS * 86400000);
     return sessionCookie(req, token, SESSION_DAYS * 86400);
   }
 
-  function currentUser(req) {
+  async function currentUser(req) {
     const token = parseCookies(req)[COOKIE];
     if (!token) return null;
-    const s = q.getSess.get(sha256(token));
+    const s = await q.getSess.get(sha256(token));
     if (!s || s.expires_at < Date.now()) return null;
-    return q.userById.get(s.user_id) || null;
+    return await q.userById.get(s.user_id) || null;
   }
 
-  function requireUser(req) {
-    const u = currentUser(req);
+  async function requireUser(req) {
+    const u = await currentUser(req);
     if (!u) throw new HttpError(401, 'Faça login para continuar');
     return u;
   }
@@ -77,37 +79,65 @@ function createAuth(db) {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email) || email.length > 160) throw new HttpError(400, 'E-mail inválido');
     if (typeof password !== 'string' || password.length < 8 || password.length > 200) throw new HttpError(400, 'A senha precisa ter pelo menos 8 caracteres');
     if (!name) throw new HttpError(400, 'Informe seu nome');
-    if (q.userByEmail.get(email)) throw new HttpError(409, 'Já existe uma conta com este e-mail');
+    if (await q.userByEmail.get(email)) throw new HttpError(409, 'Já existe uma conta com este e-mail');
     const id = 'u_' + randomId(12);
     const hash = await hashPassword(password);
-    if (q.userByEmail.get(email)) throw new HttpError(409, 'Já existe uma conta com este e-mail');
-    q.insUser.run(id, email, name, hash, Date.now());
-    return { user: q.userById.get(id), cookie: createSession(req, id) };
+    if (await q.userByEmail.get(email)) throw new HttpError(409, 'Já existe uma conta com este e-mail');
+    await q.insUser.run(id, email, name, hash, Date.now());
+    return { user: await q.userById.get(id), cookie: await createSession(req, id) };
   }
 
   async function login(req, { email, password }) {
     email = normEmail(email);
     if (!ipLimit(clientIp(req)) || !emailLimit(email)) throw new HttpError(429, 'Muitas tentativas. Aguarde alguns minutos.');
-    const u = q.userByEmail.get(email);
+    const u = await q.userByEmail.get(email);
     const ok = await verifyPassword(String(password || ''), u ? u.pass_hash : DUMMY_HASH);
     if (!u || !ok) throw new HttpError(401, 'E-mail ou senha incorretos');
-    return { user: q.userById.get(u.id), cookie: createSession(req, u.id) };
+    return { user: await q.userById.get(u.id), cookie: await createSession(req, u.id) };
   }
 
-  function logout(req) {
+  async function loginWithGoogle(req, { subject, email, name }) {
+    email = normEmail(email);
+    if (!subject || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) throw new HttpError(401, 'A conta Google não retornou um e-mail válido.');
+    let account = await q.accountBySubject.get('google', subject);
+    let user;
+    if (account) {
+      user = await q.userById.get(account.user_id);
+      if (!user) throw new HttpError(401, 'Não foi possível localizar sua conta.');
+    } else {
+      user = await q.userByEmail.get(email);
+      if (!user) {
+        const id = 'u_' + randomId(12);
+        const hash = await hashPassword(randomId(48));
+        try { await q.insUser.run(id, email, String(name || email.split('@')[0]).trim().slice(0, 60) || 'Usuário', hash, Date.now()); }
+        catch (e) {
+          if (!await q.userByEmail.get(email)) throw e;
+        }
+        user = await q.userByEmail.get(email);
+      }
+      try { await q.insAccount.run('google', subject, user.id, Date.now()); }
+      catch (e) {
+        account = await q.accountBySubject.get('google', subject);
+        if (!account || account.user_id !== user.id) throw new HttpError(409, 'Esta conta Google já está vinculada a outro perfil.');
+      }
+    }
+    return { user, cookie: await createSession(req, user.id) };
+  }
+
+  async function logout(req) {
     const token = parseCookies(req)[COOKIE];
-    if (token) q.delSess.run(sha256(token));
+    if (token) await q.delSess.run(sha256(token));
     return sessionCookie(req, '', 0);
   }
 
   async function deleteUser(req, userId, password) {
-    const u = db.prepare('SELECT pass_hash FROM users WHERE id = ?').get(userId);
+    const u = await db.prepare('SELECT pass_hash FROM users WHERE id = ?').get(userId);
     if (!u || !(await verifyPassword(String(password || ''), u.pass_hash))) throw new HttpError(401, 'Senha incorreta');
-    q.delUser.run(userId); // cascade: sessões, documento, transações, conexões
+    await q.delUser.run(userId); // cascade: sessões, documento, transações, conexões
     return sessionCookie(req, '', 0);
   }
 
-  return { currentUser, requireUser, signup, login, logout, deleteUser };
+  return { currentUser, requireUser, signup, login, loginWithGoogle, logout, deleteUser };
 }
 
 module.exports = { createAuth, hashPassword, verifyPassword };

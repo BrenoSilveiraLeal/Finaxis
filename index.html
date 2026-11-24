@@ -3,160 +3,226 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Finaxis | Controle financeiro que aprende com você</title>
-  <meta name="description" content="Conecte seus bancos e cartões via Open Finance, veja seus gastos categorizados em tempo real, crie caixinhas com simulação de metas e aprenda a cuidar do seu dinheiro.">
-  <link rel="icon" href="assets/img/mascot.svg" type="image/svg+xml">
+  <title>Finaxis | Controle financeiro com Open Finance</title>
+  <meta name="description" content="Conecte seus bancos e cartões via Open Finance, veja seus gastos categorizados automaticamente, planeje metas com simulação de rendimento e acompanhe suas contas fixas.">
+  <meta name="theme-color" content="#F3F5F4">
+  <link rel="icon" href="assets/img/logo.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@1&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/finaxis.css">
+  <script src="assets/js/scale.js"></script>
   <script src="assets/js/landing.js"></script>
 </head>
 <body>
   <header class="site-header" id="top">
-    <div class="header-inner">
-      <a href="#top" class="brand" aria-label="Finaxis início">
-        <img src="assets/img/mascot.svg" alt="">
-        <span class="brand-word">FIN<em>AXIS</em></span>
+    <div class="wrap header-inner">
+      <a href="#top" class="brand" aria-label="Finaxis, início">
+        <img src="assets/img/logo.svg" alt="">
+        <span class="brand-word">Finaxis</span>
       </a>
       <nav class="nav-wrapper" aria-label="Navegação principal">
         <ul class="nav-links">
           <li><a href="#recursos">Recursos</a></li>
+          <li><a href="#seguranca">Segurança</a></li>
           <li><a href="#simulador">Simulador</a></li>
-          <li><a href="#numeros">Resultados</a></li>
           <li><a href="#planos">Planos</a></li>
         </ul>
-        <a class="nav-cta" href="app.html">Abrir app <img src="assets/img/arrow.svg" alt=""></a>
+        <div class="nav-actions">
+          <a class="btn btn-ghost btn-sm" href="app.html">Entrar</a>
+          <a class="btn btn-lime btn-sm" href="app.html">Criar conta grátis</a>
+        </div>
       </nav>
     </div>
   </header>
 
   <main>
     <section class="hero">
-      <span class="hero-badge">Open Finance + educação financeira num só app</span>
-      <h1 class="display">
-        <span class="row">SEU DINHEIRO</span>
-        <span class="row"><img class="hero-mascot" id="mascot" src="assets/img/mascot.svg" alt="Fini, o mascote Finaxis"> sob <span class="serif">controle</span> DE</span>
-        <span class="row">VERDADE, EM TEMPO REAL</span>
-      </h1>
-      <p class="lead">Conecte cartões e contas, veja cada Pix e cada compra já categorizada, monte caixinhas para seus sonhos e descubra em quantos meses você chega lá.</p>
-      <a class="btn btn-lime btn-lg" href="app.html">Quero organizar minhas finanças <img class="arrow" src="assets/img/arrow.svg" alt=""></a>
+      <div class="wrap hero-grid">
+        <div>
+          <h1>Todas as suas contas, em um só extrato.</h1>
+          <p class="lead">O Finaxis reúne bancos e cartões via Open Finance, categoriza cada lançamento e mostra quanto falta para cada meta. Você entende para onde vai o dinheiro sem preencher planilha.</p>
+          <div class="hero-ctas">
+            <a class="btn btn-lime btn-lg" href="app.html">Começar grátis <img class="arrow" src="assets/img/arrow.svg" alt=""></a>
+            <a class="btn btn-lg" href="#recursos">Ver recursos</a>
+          </div>
+          <p class="hero-note">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg>
+            <span>A conexão segue as regras do Open Finance Brasil: você autoriza no app do seu banco, o acesso é só de leitura e pode ser revogado quando quiser.</span>
+          </p>
+        </div>
 
-      <div class="fan" aria-label="Destaques do app">
-        <article class="fan-card">
-          <div class="fan-top" style="background:#C8FF2E"><span class="emoji">🔗</span><span class="big">OPEN<br>FINANCE</span></div>
-          <p class="fan-cap">Bancos e cartões conectados, sem digitar nada</p>
-        </article>
-        <article class="fan-card wine">
-          <div class="fan-top" style="background:#F8330B;color:#fff"><span class="emoji">🍔</span><span class="big">R$ 842<br><small style="font-size:.7em">COMIDA</small></span></div>
-          <p class="fan-cap">Categorias automáticas: iFood, Uber, mercado…</p>
-        </article>
-        <article class="fan-card">
-          <div class="fan-top" style="background:#FEFAE7">
-            <svg class="mini-ring" viewBox="0 0 36 36"><circle cx="18" cy="18" r="14" fill="none" stroke="#16161622" stroke-width="6"/><circle cx="18" cy="18" r="14" fill="none" stroke="#F8330B" stroke-width="6" stroke-dasharray="62 88" transform="rotate(-90 18 18)"/></svg>
-            <span class="big">✈️ 71%</span>
+        <div class="statement" role="img" aria-label="Exemplo do painel Finaxis: saldo consolidado, últimas transações categorizadas e progresso de uma meta">
+          <div class="st-top">
+            <div>
+              <small>Saldo consolidado em 3 contas</small>
+              <div class="st-balance"><span>R$</span>12.480,35</div>
+            </div>
+            <div class="st-delta">+R$ 1.240 este mês</div>
+            <svg class="st-spark" viewBox="0 0 400 44" preserveAspectRatio="none" aria-hidden="true">
+              <path d="M0 34 L40 30 L80 32 L120 24 L160 27 L200 20 L240 22 L280 15 L320 17 L360 9 L400 6" fill="none" stroke="#3DBA85" stroke-width="2" vector-effect="non-scaling-stroke"/>
+              <path d="M0 34 L40 30 L80 32 L120 24 L160 27 L200 20 L240 22 L280 15 L320 17 L360 9 L400 6 L400 44 L0 44Z" fill="#3DBA85" opacity=".12"/>
+            </svg>
           </div>
-          <p class="fan-cap">Caixinha "Viagem Chile" chega em 5 meses</p>
-        </article>
-        <article class="fan-card wine">
-          <div class="fan-top" style="background:#161616;color:#C8FF2E"><span class="emoji">📅</span><span class="big">DIA 15<br>TELEFONE</span></div>
-          <p class="fan-cap">Contas fixas lançadas sozinhas na data certa</p>
-        </article>
-        <article class="fan-card">
-          <div class="fan-top" style="background:#fff">
-            <div class="mini-bars"><i style="height:40%"></i><i style="height:65%"></i><i style="height:52%;background:#F8330B"></i><i style="height:88%"></i><i style="height:70%;background:#C8FF2E;border:1.5px solid #161616"></i></div>
-            <span class="big">-18%</span>
+          <div class="st-body">
+            <div class="st-ledger">
+              <h4>Hoje</h4>
+              <div class="st-row"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l2.5 12h11L21 7H6"/></svg></i><div><b>Pão de Açúcar</b><em>Mercado · Débito</em></div><span>−R$ 186,40</span></div>
+              <div class="st-row"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 15l1.5-6h11L19 15M3 15h18v4H3zM7 19v2M17 19v2"/></svg></i><div><b>Uber</b><em>Transporte · Crédito</em></div><span>−R$ 23,90</span></div>
+              <div class="st-row"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M4 20h16"/></svg></i><div><b>Pix de Marina S.</b><em>Pix recebido</em></div><span class="pos">+R$ 150,00</span></div>
+              <div class="st-row"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M10 8l5 2.5-5 2.5zM8 21h8"/></svg></i><div><b>Spotify</b><em>Assinaturas · Crédito</em></div><span>−R$ 21,90</span></div>
+            </div>
+            <div class="st-goal">
+              <h4>Meta</h4>
+              <div class="g-name">Reserva de emergência</div>
+              <div class="g-nums">R$ 11.160 de R$ 18.000</div>
+              <div class="g-bar"><i></i></div>
+              <div class="g-eta">Guardando R$ 600 por mês, você chega lá em <b>outubro de 2027</b>.</div>
+              <h4 style="margin-top:14px">Gastos do mês</h4>
+              <div class="st-cats" aria-hidden="true"><i style="flex:32;background:#3E5C76"></i><i style="flex:24;background:#6FA898"></i><i style="flex:18;background:#D4553A"></i><i style="flex:14;background:#0B3D33"></i><i style="flex:12;background:#C3CCC9"></i></div>
+              <div class="st-cats-legend"><span style="--c:#3E5C76">Moradia</span><span style="--c:#6FA898">Mercado</span><span style="--c:#D4553A">Alimentação</span><span style="--c:#0B3D33">Transporte</span></div>
+            </div>
           </div>
-          <p class="fan-cap">Relatórios mostram onde você está melhorando</p>
-        </article>
-        <article class="fan-card wine">
-          <div class="fan-top" style="background:#C8FF2E"><span class="emoji">💡</span><span class="big">DICAS<br>PRA VOCÊ</span></div>
-          <p class="fan-cap">Insights baseados nos seus próprios gastos</p>
-        </article>
+        </div>
       </div>
     </section>
 
-    <svg class="squiggle" viewBox="0 0 1240 26" preserveAspectRatio="none" aria-hidden="true"><path d="M0 13 Q 15 0 30 13 T 60 13 T 90 13 T 120 13 T 150 13 T 180 13 T 210 13 T 240 13 T 270 13 T 300 13 T 330 13 T 360 13 T 390 13 T 420 13 T 450 13 T 480 13 T 510 13 T 540 13 T 570 13 T 600 13 T 630 13 T 660 13 T 690 13 T 720 13 T 750 13 T 780 13 T 810 13 T 840 13 T 870 13 T 900 13 T 930 13 T 960 13 T 990 13 T 1020 13 T 1050 13 T 1080 13 T 1110 13 T 1140 13 T 1170 13 T 1200 13 T 1230 13 T 1260 13" fill="none" stroke="#161616" stroke-width="2.5"/></svg>
+    <section class="logos" aria-label="Instituições compatíveis">
+      <div class="wrap">
+        <p>Conecta com as instituições participantes do Open Finance, como</p>
+        <ul><li>Nubank</li><li>Itaú</li><li>Bradesco</li><li>Banco do Brasil</li><li>Santander</li><li>Inter</li><li>Caixa</li></ul>
+      </div>
+    </section>
 
     <section class="section" id="recursos">
-      <div class="section-head">
-        <span class="pill">Recursos</span>
-        <h2 class="display">Tudo que você precisa para <span class="sticker">dominar</span> seu dinheiro</h2>
-        <p>O melhor de uma planilha inteligente com a praticidade de um app: o Finaxis puxa, organiza, projeta e te ensina.</p>
-      </div>
-      <div class="feature-grid">
-        <article class="feature"><div class="f-ico">🏦</div><h3>Bancos e cartões conectados</h3><p>Via Open Finance, com seu consentimento. Pix, débito, crédito e salário entram sozinhos — com saldo e fatura atualizados.</p></article>
-        <article class="feature"><div class="f-ico">🏷️</div><h3>Categorização automática</h3><p>Uber vira transporte, iFood vira alimentação, Pão de Açúcar vira mercado. Corrigiu uma vez? O app aprende.</p></article>
-        <article class="feature"><div class="f-ico">🐷</div><h3>Caixinhas com simulador</h3><p>Diga quanto guarda por mês e veja a data em que você bate a meta, já contando o rendimento.</p></article>
-        <article class="feature"><div class="f-ico">📅</div><h3>Contas fixas e calendário</h3><p>Aluguel, telefone, streaming: cadastre uma vez e o lançamento aparece todo mês no dia certo, com lembrete.</p></article>
-        <article class="feature"><div class="f-ico">🎯</div><h3>Orçamentos por categoria</h3><p>Limites mensais com alerta quando você chega a 80%. Sugestão automática pela regra 50/30/20 do seu salário.</p></article>
-        <article class="feature"><div class="f-ico">🎓</div><h3>Aprenda jogando</h3><p>Trilhas curtas de educação financeira, desafios de economia e o Finaxis Score para acompanhar sua evolução.</p></article>
-      </div>
-    </section>
-
-    <section class="section" id="simulador" style="padding-top:20px">
-      <div class="section-head">
-        <span class="pill pill-red">Simulador</span>
-        <h2 class="display">Quanto tempo até o seu <span class="serif">sonho</span>?</h2>
-      </div>
-      <div class="sim-landing">
-        <div class="sim-form">
-          <div class="field"><label for="lsTarget">Quanto custa a meta?</label><div class="input-money"><input class="input" id="lsTarget" type="number" min="0" value="8000"></div></div>
-          <div class="field"><label for="lsMonthly">Quanto você guarda por mês?</label><div class="input-money"><input class="input" id="lsMonthly" type="number" min="0" value="400"></div></div>
-          <div class="field"><label for="lsRate">Rendimento ao ano: <span id="lsRateV">10,5%</span></label><input id="lsRate" type="range" min="0" max="15" step="0.5" value="10.5"><span class="hint">Referência aproximada de um CDB 100% do CDI</span></div>
+      <div class="wrap">
+        <div class="section-head">
+          <h2>O que você precisa para cuidar do dinheiro, sem trabalho manual</h2>
+          <p>O Finaxis busca seus lançamentos, organiza por categoria e transforma isso em decisões: quanto dá para gastar, quanto guardar e quando a meta chega.</p>
         </div>
-        <div class="sim-out">
-          <span class="tag" style="background:#C8FF2E;align-self:flex-start">Resultado</span>
-          <div class="big" id="lsMonths">—</div>
-          <p id="lsText" style="line-height:1.5"></p>
-          <a class="btn btn-lime" href="app.html#/caixinhas" style="align-self:flex-start">Criar minha caixinha <img class="arrow" src="assets/img/arrow.svg" alt=""></a>
+        <div class="feature-grid">
+          <article class="feature">
+            <div class="f-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10l9-6 9 6M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 21h18"/></svg></div>
+            <h3>Bancos e cartões conectados</h3>
+            <p>Pix, débito, crédito e salário entram sozinhos, com saldo e fatura sempre atualizados.</p>
+          </article>
+          <article class="feature">
+            <div class="f-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z"/><circle cx="7.5" cy="7.5" r="1.2"/></svg></div>
+            <h3>Categorização automática</h3>
+            <p>Uber vai para transporte, iFood para alimentação. Corrigiu uma vez, o Finaxis lembra nas próximas.</p>
+          </article>
+          <article class="feature">
+            <div class="f-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6"/></svg></div>
+            <h3>Caixinhas com projeção</h3>
+            <p>Informe quanto guarda por mês e veja a data em que a meta é atingida, já contando o rendimento.</p>
+          </article>
+          <article class="feature">
+            <div class="f-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></div>
+            <h3>Contas fixas no calendário</h3>
+            <p>Aluguel, telefone e assinaturas aparecem todo mês na data certa, com lembrete antes do vencimento.</p>
+          </article>
+          <article class="feature">
+            <div class="f-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg></div>
+            <h3>Orçamento por categoria</h3>
+            <p>Limites mensais com alerta ao chegar em 80%, e uma sugestão inicial pela regra 50/30/20 do seu salário.</p>
+          </article>
+          <article class="feature">
+            <div class="f-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8M15 7h6v6"/></svg></div>
+            <h3>Relatórios e orientação</h3>
+            <p>Compare meses, veja tendências por categoria e receba dicas baseadas nos seus próprios gastos.</p>
+          </article>
         </div>
       </div>
     </section>
 
-    <section class="section stats-band" id="numeros">
-      <div class="section-head">
-        <span class="pill">Impacto</span>
-        <h2 class="display">Quem organiza, <span class="sticker">sobra</span></h2>
-      </div>
-      <div class="stats-grid">
-        <div class="stat"><b>+300</b><span>regras de categorização automática prontas</span></div>
-        <div class="stat"><b>24/7</b><span>sincronização com os bancos conectados</span></div>
-        <div class="stat"><b>50/30/20</b><span>orçamento sugerido a partir do seu salário</span></div>
-        <div class="stat"><b>0</b><span>planilhas para você preencher na mão</span></div>
+    <section class="section trust" id="seguranca">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>Seus dados continuam sob seu controle</h2>
+          <p>A conexão com os bancos usa o Open Finance Brasil, o sistema regulado pelo Banco Central para compartilhar dados financeiros com consentimento.</p>
+        </div>
+        <div class="trust-grid">
+          <div class="trust-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 12l2 2 4-4"/><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z"/></svg>
+            <h3>Você autoriza no seu banco</h3>
+            <p>O consentimento é dado no ambiente do próprio banco, com prazo e escopo definidos. O Finaxis não pede sua senha bancária.</p>
+          </div>
+          <div class="trust-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+            <h3>Acesso somente de leitura</h3>
+            <p>O Finaxis lê saldos e transações para organizar suas finanças. Ele não faz pagamentos nem movimenta dinheiro.</p>
+          </div>
+          <div class="trust-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            <h3>Revogue quando quiser</h3>
+            <p>Desconecte um banco pelo Finaxis ou pelo app da instituição. Você também pode excluir sua conta e seus dados a qualquer momento.</p>
+          </div>
+        </div>
       </div>
     </section>
 
-    <section class="section pricing-band" id="planos">
-      <div class="section-head">
-        <span class="pill pill-red">Planos</span>
-        <h2 class="display">Comece grátis, <span class="serif">evolua</span> quando quiser</h2>
+    <section class="section" id="simulador">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>Em quanto tempo você chega na sua meta?</h2>
+          <p>Simule com seus números. A conta considera aportes mensais e rendimento composto.</p>
+        </div>
+        <div class="sim-landing">
+          <div class="sim-form">
+            <div class="field"><label for="lsTarget">Valor da meta</label><div class="input-money"><input class="input" id="lsTarget" type="number" min="0" inputmode="decimal" value="8000"></div></div>
+            <div class="field"><label for="lsMonthly">Quanto você guarda por mês</label><div class="input-money"><input class="input" id="lsMonthly" type="number" min="0" inputmode="decimal" value="400"></div></div>
+            <div class="field"><label for="lsRate">Rendimento anual: <span id="lsRateV">10,5%</span></label><input id="lsRate" type="range" min="0" max="15" step="0.5" value="10.5"><span class="hint">Referência aproximada de um CDB a 100% do CDI.</span></div>
+          </div>
+          <div class="sim-out" aria-live="polite">
+            <small>Tempo estimado</small>
+            <div class="big" id="lsMonths">—</div>
+            <p id="lsText"></p>
+            <div class="sim-split" aria-hidden="true"><i id="lsSplitA" style="width:90%"></i><i id="lsSplitB" style="width:10%"></i></div>
+            <div class="sim-split-legend"><span style="--c:#0B3D33">Seus aportes</span><span style="--c:#3DBA85">Rendimento</span></div>
+            <a class="btn btn-lime" href="app.html#/caixinhas" style="align-self:flex-start;margin-top:8px">Criar esta caixinha</a>
+          </div>
+        </div>
       </div>
-      <div class="price-grid">
-        <article class="price">
-          <h3>Essencial</h3><p class="muted">Para começar a enxergar seu dinheiro.</p>
-          <div class="amount">GRÁTIS</div>
-          <a class="btn" href="app.html">Começar grátis</a>
-          <ul><li>1 banco e 1 cartão conectados</li><li>Categorização automática</li><li>3 caixinhas com simulador</li><li>Trilha básica de educação financeira</li></ul>
-        </article>
-        <article class="price pro">
-          <div style="display:flex;justify-content:space-between;align-items:center"><h3>Finaxis PRO</h3><span class="tag" style="background:#C8FF2E;color:#161616">Recomendado</span></div>
-          <p style="opacity:.85">Para quem quer controle total e metas aceleradas.</p>
-          <div class="amount">R$ 14<small style="font-size:.4em"> /MÊS</small></div>
-          <a class="btn btn-lime" href="app.html">Testar 7 dias grátis <img class="arrow" src="assets/img/arrow.svg" alt=""></a>
-          <ul><li>Bancos e cartões ilimitados</li><li>Caixinhas ilimitadas e metas em casal</li><li>Relatórios avançados e exportação</li><li>Todas as trilhas e desafios</li><li>Alertas inteligentes de gastos fora do padrão</li></ul>
-        </article>
+    </section>
+
+    <section class="section" id="planos" style="padding-top:0">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>Comece grátis. Assine quando precisar de mais.</h2>
+        </div>
+        <div class="price-grid">
+          <article class="price">
+            <h3>Essencial</h3>
+            <p class="muted">Para começar a enxergar seu dinheiro.</p>
+            <div class="amount">R$ 0</div>
+            <a class="btn" href="app.html">Criar conta grátis</a>
+            <ul><li>1 banco e 1 cartão conectados</li><li>Categorização automática</li><li>3 caixinhas com simulador</li><li>Trilha básica de educação financeira</li></ul>
+          </article>
+          <article class="price pro">
+            <div class="price-head"><h3>Finaxis Pro</h3><span class="pill">Mais escolhido</span></div>
+            <p class="muted">Para quem quer controle completo e metas compartilhadas.</p>
+            <div class="amount">R$ 14<small>/mês</small></div>
+            <a class="btn btn-lime" href="app.html">Testar 7 dias grátis</a>
+            <ul><li>Bancos e cartões ilimitados</li><li>Caixinhas ilimitadas e metas em casal</li><li>Relatórios avançados e exportação</li><li>Todas as trilhas e desafios</li><li>Alertas de gastos fora do padrão</li></ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta-band">
+      <div class="wrap">
+        <h2>Conecte sua primeira conta em menos de dois minutos.</h2>
+        <a class="btn btn-lime btn-lg" href="app.html">Começar grátis <img class="arrow" src="assets/img/arrow.svg" alt=""></a>
       </div>
     </section>
   </main>
 
   <footer class="site-footer">
-    <div class="inner">
-      <a href="#top" class="brand" aria-label="Finaxis início"><img src="assets/img/mascot.svg" alt=""><span class="brand-word">FIN<em>AXIS</em></span></a>
-      <span class="muted">© 2026 Finaxis. Protótipo, dados de demonstração.</span>
-      <nav><a href="#top">Voltar ao topo</a><a href="#">Privacidade</a><a href="#">Termos</a></nav>
+    <div class="wrap inner">
+      <a href="#top" class="brand" aria-label="Finaxis, início"><img src="assets/img/logo.svg" alt=""><span class="brand-word">Finaxis</span></a>
+      <span>© 2026 Finaxis. Protótipo com dados de demonstração.</span>
+      <nav aria-label="Rodapé"><a href="#">Privacidade</a><a href="#">Termos</a><a href="#top">Voltar ao topo</a></nav>
     </div>
   </footer>
-
 </body>
 </html>

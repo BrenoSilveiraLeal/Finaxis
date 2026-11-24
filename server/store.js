@@ -27,62 +27,62 @@ function createStore(db) {
     isTomb: db.prepare('SELECT 1 AS x FROM tx_tombstones WHERE user_id = ? AND id = ?'),
   };
 
-  function readDoc(uid) {
-    const r = q.getDoc.get(uid);
+  async function readDoc(uid) {
+    const r = await q.getDoc.get(uid);
     return r ? { doc: JSON.parse(r.data), version: r.version } : { doc: null, version: 0 };
   }
 
-  function writeDoc(uid, doc, prevVersion) {
+  async function writeDoc(uid, doc, prevVersion) {
     const data = JSON.stringify(doc);
     if (data.length > MAX_DOC_BYTES) throw new HttpError(413, 'Documento grande demais');
     const now = Date.now();
-    if (prevVersion === 0) q.insDoc.run(uid, data, 1, now);
-    else q.updDoc.run(data, prevVersion + 1, now, uid);
+    if (prevVersion === 0) await q.insDoc.run(uid, data, 1, now);
+    else await q.updDoc.run(data, prevVersion + 1, now, uid);
     return prevVersion + 1;
   }
 
   /** Alteração feita pelo servidor (sync bancário). Sempre incrementa a versão. */
-  function mutateDoc(uid, fn) {
-    const { doc, version } = readDoc(uid);
+  async function mutateDoc(uid, fn) {
+    const { doc, version } = await readDoc(uid);
     const d = doc || {};
     fn(d);
     return writeDoc(uid, d, version);
   }
 
-  const listTx = (uid) => q.allTx.all(uid).map((r) => JSON.parse(r.data));
-  const getTx = (uid, id) => { const r = q.getTx.get(uid, id); return r ? JSON.parse(r.data) : null; };
+  const listTx = async (uid) => (await q.allTx.all(uid)).map((r) => JSON.parse(r.data));
+  const getTx = async (uid, id) => { const r = await q.getTx.get(uid, id); return r ? JSON.parse(r.data) : null; };
   const putTx = (uid, t) => q.upTx.run(uid, t.id, t.date, JSON.stringify(t), Date.now());
-  const isTombstoned = (uid, id) => !!q.isTomb.get(uid, id);
+  const isTombstoned = async (uid, id) => !!(await q.isTomb.get(uid, id));
 
-  function getState(uid) {
-    const { doc, version } = readDoc(uid);
-    return { doc, version, tx: listTx(uid) };
+  async function getState(uid) {
+    const { doc, version } = await readDoc(uid);
+    return { doc, version, tx: await listTx(uid) };
   }
 
   /**
    * Aplica alterações do cliente. Transações (upserts/deletes) são idempotentes e sempre aplicadas;
    * o documento usa controle otimista de versão e pode gerar conflito (409).
    */
-  function applyClientChanges(uid, body) {
+  async function applyClientChanges(uid, body) {
     const { baseVersion, doc, upserts = [], deletes = [] } = body || {};
     if (!Array.isArray(upserts) || !Array.isArray(deletes)) throw new HttpError(400, 'Formato inválido');
     if (upserts.length > MAX_TX_PER_PUT || deletes.length > MAX_TX_PER_PUT) throw new HttpError(413, 'Lote grande demais');
     let rejected = 0;
-    return db.atomic(() => {
+    return db.atomic(async () => {
       const now = Date.now();
-      for (const t of upserts) { if (validTx(t)) putTx(uid, t); else rejected++; }
+      for (const t of upserts) { if (validTx(t)) await putTx(uid, t); else rejected++; }
       for (const id of deletes) {
         if (typeof id !== 'string') continue;
-        q.delTx.run(uid, id);
-        if (/^(of|dm)_/.test(id)) q.tomb.run(uid, id, now); // transação bancária: não reimportar
+        await q.delTx.run(uid, id);
+        if (/^(of|dm)_/.test(id)) await q.tomb.run(uid, id, now); // transação bancária: não reimportar
       }
-      const cur = readDoc(uid);
+      const cur = await readDoc(uid);
       if (doc === undefined) return { ok: true, version: cur.version, rejected };
       if (!doc || typeof doc !== 'object' || Array.isArray(doc)) throw new HttpError(400, 'Documento inválido');
       if (cur.version !== baseVersion) return { ok: false, conflict: true, version: cur.version, doc: cur.doc, rejected };
       const clean = { ...doc };
       delete clean.tx;
-      return { ok: true, version: writeDoc(uid, clean, cur.version), rejected };
+      return { ok: true, version: await writeDoc(uid, clean, cur.version), rejected };
     });
   }
 

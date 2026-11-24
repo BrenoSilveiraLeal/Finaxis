@@ -29,36 +29,42 @@
   const brlRaw = (v, dec = 2) => (v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: dec, maximumFractionDigits: dec });
   const brl = (v, dec) => (S && S.settings.hide ? 'R$ •••' : brlRaw(v, dec));
   const brl0 = (v) => brl(v, 0);
+  const moneyIn = (v, currency) => {
+    if (!currency || currency === 'BRL') return brl(v);
+    if (S && S.settings.hide) return '•••';
+    try { return new Intl.NumberFormat('pt-BR', { style: 'currency', currency }).format(v || 0); }
+    catch { return `${currency} ${Number(v || 0).toLocaleString('pt-BR')}`; }
+  };
   const signed = (v) => (S.settings.hide ? 'R$ •••' : (v < 0 ? '− ' : '+ ') + brlRaw(Math.abs(v)));
   const kfmt = (v) => (v >= 1000 ? (v / 1000).toFixed(1).replace('.', ',').replace(',0', '') + 'k' : String(Math.round(v)));
   const pct = (v) => `${Math.round(v * 100)}%`;
   const ARROW = '<img class="arrow" src="assets/img/arrow.svg" alt="">';
-  const MASCOT = 'assets/img/mascot.svg';
+  const MASCOT = 'assets/img/logo.svg';
 
   function mulberry32(a) { return function () { a |= 0; a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
 
   /* --------------------------------------------------------- catálogos */
   const CATS = {
     // paleta contida: cores da marca + neutros quentes
-    alimentacao: { name: 'Alimentação', emoji: '🍔', color: '#F8330B', group: 'want' },
-    mercado: { name: 'Mercado', emoji: '🛒', color: '#C8FF2E', group: 'need' },
-    transporte: { name: 'Transporte', emoji: '🚗', color: '#161616', group: 'need' },
-    moradia: { name: 'Moradia', emoji: '🏠', color: '#580D14', group: 'need' },
-    contas: { name: 'Contas & serviços', emoji: '💡', color: '#A8A399', group: 'need' },
-    saude: { name: 'Saúde', emoji: '💊', color: '#D98C6A', group: 'need' },
-    educacao: { name: 'Educação', emoji: '📚', color: '#C9B98F', group: 'need' },
-    compras: { name: 'Compras', emoji: '🛍️', color: '#F2C1B0', group: 'want' },
-    lazer: { name: 'Lazer', emoji: '🎉', color: '#5E5A52', group: 'want' },
-    assinaturas: { name: 'Assinaturas', emoji: '📺', color: '#a52207', group: 'want' },
-    viagem: { name: 'Viagem', emoji: '✈️', color: '#E3DFD2', group: 'want' },
-    pets: { name: 'Pets', emoji: '🐶', color: '#B08968', group: 'want' },
-    outros: { name: 'Outros', emoji: '📦', color: '#D6D3C8', group: 'want' },
-    salario: { name: 'Salário', emoji: '💰', color: '#C8FF2E', income: true },
-    freela: { name: 'Freelas & extras', emoji: '💼', color: '#C8FF2E', income: true },
-    rendimentos: { name: 'Rendimentos', emoji: '📈', color: '#C8FF2E', income: true },
-    pixrecebido: { name: 'Pix recebido', emoji: '⚡', color: '#C8FF2E', income: true },
-    caixinha: { name: 'Caixinhas', emoji: '🐷', color: '#C8FF2E', system: true },
-    fatura: { name: 'Pagamento de fatura', emoji: '💳', color: '#580D14', system: true },
+    alimentacao: { name: 'Alimentação', emoji: '🍔', color: '#D4553A', group: 'want' },
+    mercado: { name: 'Mercado', emoji: '🛒', color: '#6FA898', group: 'need' },
+    transporte: { name: 'Transporte', emoji: '🚗', color: '#0B3D33', group: 'need' },
+    moradia: { name: 'Moradia', emoji: '🏠', color: '#3E5C76', group: 'need' },
+    contas: { name: 'Contas & serviços', emoji: '💡', color: '#8FA39C', group: 'need' },
+    saude: { name: 'Saúde', emoji: '💊', color: '#C98A5E', group: 'need' },
+    educacao: { name: 'Educação', emoji: '📚', color: '#B7A46A', group: 'need' },
+    compras: { name: 'Compras', emoji: '🛍️', color: '#E3A08C', group: 'want' },
+    lazer: { name: 'Lazer', emoji: '🎉', color: '#6C7A89', group: 'want' },
+    assinaturas: { name: 'Assinaturas', emoji: '📺', color: '#9C3B2A', group: 'want' },
+    viagem: { name: 'Viagem', emoji: '✈️', color: '#9DB7C9', group: 'want' },
+    pets: { name: 'Pets', emoji: '🐶', color: '#A58A6E', group: 'want' },
+    outros: { name: 'Outros', emoji: '📦', color: '#C3CCC9', group: 'want' },
+    salario: { name: 'Salário', emoji: '💰', color: '#3DBA85', income: true },
+    freela: { name: 'Freelas & extras', emoji: '💼', color: '#3DBA85', income: true },
+    rendimentos: { name: 'Rendimentos', emoji: '📈', color: '#3DBA85', income: true },
+    pixrecebido: { name: 'Pix recebido', emoji: '⚡', color: '#3DBA85', income: true },
+    caixinha: { name: 'Caixinhas', emoji: '🐷', color: '#3DBA85', system: true },
+    fatura: { name: 'Pagamento de fatura', emoji: '💳', color: '#3E5C76', system: true },
   };
   // Variações de design (?v=black,icons,dark)
   const VARIANT = (new URLSearchParams(location.search).get('v') || '').split(',').join(' ');
@@ -158,7 +164,7 @@
 
   // Banco de uma conta/cartão: catálogo conhecido ou dados vindos do agregador (nome/cor)
   const bankOf = (o) => (o && BANKS[o.bank] && o.bank !== 'other' ? BANKS[o.bank]
-    : o && o.bankName ? { name: o.bankName, color: o.bankColor || '#161616', short: o.bankName.replace(/[^A-Za-zÀ-ú0-9]/g, '').slice(0, 2).toLowerCase() }
+    : o && o.bankName ? { name: o.bankName, color: o.bankColor || '#0B3D33', short: o.bankName.replace(/[^A-Za-zÀ-ú0-9]/g, '').slice(0, 2).toLowerCase() }
     : BANKS.cash);
   const isBankId = (id) => /^(of|dm)_/.test(String(id));
 
@@ -243,7 +249,7 @@
   /** Contas/cartões vindos do banco (ids of_/dm_) pertencem ao servidor; o resto é do usuário. */
   function mergeServerDoc(sd) {
     if (!sd) return;
-    for (const k of ['accounts', 'cards']) {
+    for (const k of ['accounts', 'cards', 'investments']) {
       const mine = (S[k] || []).filter((x) => !isBankId(x.id));
       const local = new Map((S[k] || []).map((x) => [x.id, x]));
       const bank = (sd[k] || []).filter((x) => isBankId(x.id)).map((x) => (local.get(x.id) && local.get(x.id).customName ? { ...x, name: local.get(x.id).name, customName: true } : x));
@@ -256,7 +262,7 @@
     const d = doc || {};
     const s = { ...base, ...d, tx };
     for (const k of ['profile', 'settings', 'learn']) s[k] = { ...base[k], ...(d[k] || {}) };
-    for (const k of ['accounts', 'cards', 'goals', 'recurring']) if (!Array.isArray(s[k])) s[k] = k === 'accounts' ? base.accounts : [];
+    for (const k of ['accounts', 'cards', 'goals', 'recurring', 'investments']) if (!Array.isArray(s[k])) s[k] = k === 'accounts' ? base.accounts : [];
     for (const k of ['budgets', 'learned', 'posted', 'paid']) if (!s[k] || typeof s[k] !== 'object') s[k] = {};
     return s;
   }
@@ -330,7 +336,7 @@
       v: 1, demo: !!demo,
       profile: { name: 'Você', salary: 0, payday: 5 },
       accounts: [{ id: 'a3', bank: 'cash', name: 'Carteira', kind: 'dinheiro', initial: 0, connected: false }],
-      cards: [], tx: [], recurring: [], goals: [], budgets: {}, learned: {}, posted: {}, paid: {},
+      cards: [], investments: [], tx: [], recurring: [], goals: [], budgets: {}, learned: {}, posted: {}, paid: {},
       learn: { done: [], xp: 0, challenges: {} },
       settings: { live: true, hide: false, reminders: true },
       recStart: ymOf(now()),
@@ -366,9 +372,9 @@
       { id: 'r8', desc: 'Energia Enel', amount: -168.4, cat: 'contas', day: 22, method: 'pix', accountId: 'a2' },
     ];
     s.goals = [
-      { id: 'g1', name: 'Viagem para o Chile', emoji: '✈️', target: 8000, saved: 0, monthly: 500, rate: 10.5, color: '#F8330B', autoDay: 6, accountId: 'a1' },
-      { id: 'g2', name: 'Reserva de emergência', emoji: '🛟', target: 18000, saved: 0, monthly: 400, rate: 10.5, color: '#C8FF2E', autoDay: 6, accountId: 'a1', kind: 'reserva' },
-      { id: 'g3', name: 'PlayStation 5', emoji: '🎮', target: 3800, saved: 0, monthly: 250, rate: 0, color: '#580D14' },
+      { id: 'g1', name: 'Viagem para o Chile', emoji: '✈️', target: 8000, saved: 0, monthly: 500, rate: 10.5, color: '#D4553A', autoDay: 6, accountId: 'a1' },
+      { id: 'g2', name: 'Reserva de emergência', emoji: '🛟', target: 18000, saved: 0, monthly: 400, rate: 10.5, color: '#3DBA85', autoDay: 6, accountId: 'a1', kind: 'reserva' },
+      { id: 'g3', name: 'PlayStation 5', emoji: '🎮', target: 3800, saved: 0, monthly: 250, rate: 0, color: '#3E5C76' },
     ];
     s.budgets = { alimentacao: 650, mercado: 1100, transporte: 420, compras: 450, lazer: 300, assinaturas: 100, saude: 250 };
 
@@ -649,12 +655,12 @@
       const s = `<circle cx="80" cy="80" r="${R}" fill="none" stroke="${it.color}" stroke-width="28" stroke-dasharray="${len.toFixed(2)} ${(C - len).toFixed(2)}" stroke-dashoffset="${(-off).toFixed(2)}" transform="rotate(-90 80 80)"><title>${esc(it.label)}: ${esc(brl(it.value))}</title></circle>`;
       off += len; return s;
     }).join('');
-    return `<svg viewBox="0 0 160 160" width="170" height="170" role="img" aria-label="Gastos por categoria">
-      <circle cx="80" cy="80" r="${R}" fill="none" stroke="#eee" stroke-width="28"/>${segs}
-      <circle cx="80" cy="80" r="${R + 14}" fill="none" stroke="#161616" stroke-width="2"/>
-      <circle cx="80" cy="80" r="${R - 14}" fill="#fff" stroke="#161616" stroke-width="2"/>
-      <text x="80" y="75" text-anchor="middle" font-family="Inter" font-size="9" font-weight="700" fill="#646464">${esc(label)}</text>
-      <text x="80" y="93" text-anchor="middle" font-family="Highway Motel Sans, sans-serif" font-size="17" font-weight="900" fill="#161616">${esc(S.settings.hide ? '•••' : 'R$ ' + kfmt(total))}</text></svg>`;
+    return `<svg class="donut-chart" viewBox="0 0 160 160" width="170" height="170" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Gastos por categoria">
+      <circle cx="80" cy="80" r="${R}" fill="none" stroke="#E8EDEB" stroke-width="28"/>${segs}
+      
+      <circle cx="80" cy="80" r="${R - 14}" fill="#fff"/>
+      <text x="80" y="75" text-anchor="middle" font-family="IBM Plex Sans" font-size="9" font-weight="700" fill="#5B6B66">${esc(label)}</text>
+      <text x="80" y="93" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="17" font-weight="600" fill="#0B3D33">${esc(S.settings.hide ? '•••' : 'R$ ' + kfmt(total))}</text></svg>`;
   }
 
   function barChart(rows, curIdx) {
@@ -663,14 +669,14 @@
     const y = (v) => B - (v / max) * (B - top);
     const bw = (W - L) / rows.length;
     let g = '';
-    for (let k = 0; k <= 4; k++) { const v = (max / 4) * k, yy = y(v); g += `<line x1="${L}" x2="${W}" y1="${yy}" y2="${yy}" stroke="#16161618" stroke-dasharray="${k ? '4 4' : '0'}"/><text x="${L - 8}" y="${yy + 4}" text-anchor="end" font-size="10" font-family="Inter" fill="#646464">${S.settings.hide ? '' : kfmt(v)}</text>`; }
+    for (let k = 0; k <= 4; k++) { const v = (max / 4) * k, yy = y(v); g += `<line x1="${L}" x2="${W}" y1="${yy}" y2="${yy}" stroke="#0B3D3318" stroke-dasharray="${k ? '4 4' : '0'}"/><text x="${L - 8}" y="${yy + 4}" text-anchor="end" font-size="10" font-family="IBM Plex Sans" fill="#5B6B66">${S.settings.hide ? '' : kfmt(v)}</text>`; }
     rows.forEach((r, i) => {
       const x = L + i * bw + bw * 0.16, w = bw * 0.32;
       const on = i === curIdx;
-      g += `<rect x="${x}" y="${y(r.a)}" width="${w}" height="${B - y(r.a)}" rx="4" fill="#C8FF2E" stroke="#161616" stroke-width="2"><title>Entradas ${esc(brl(r.a))}</title></rect>`;
-      g += `<rect x="${x + w + 4}" y="${y(r.b)}" width="${w}" height="${B - y(r.b)}" rx="4" fill="${on ? '#F8330B' : '#cf2b09'}" stroke="#161616" stroke-width="2"><title>Saídas ${esc(brl(r.b))}</title></rect>`;
-      g += `<text x="${x + w + 2}" y="${B + 22}" text-anchor="middle" font-size="12" font-weight="${on ? 900 : 600}" font-family="Inter" fill="#161616">${esc(r.label)}</text>`;
-      if (on) g += `<rect x="${x - 6}" y="${B + 8}" width="${w * 2 + 16}" height="20" rx="10" fill="none" stroke="#161616" stroke-width="1.5"/>`;
+      g += `<rect x="${x}" y="${y(r.a)}" width="${w}" height="${B - y(r.a)}" rx="4" fill="#3DBA85"><title>Entradas ${esc(brl(r.a))}</title></rect>`;
+      g += `<rect x="${x + w + 4}" y="${y(r.b)}" width="${w}" height="${B - y(r.b)}" rx="4" fill="${on ? '#D4553A' : '#EBB3A6'}"><title>Saídas ${esc(brl(r.b))}</title></rect>`;
+      g += `<text x="${x + w + 2}" y="${B + 22}" text-anchor="middle" font-size="12" font-weight="${on ? 900 : 600}" font-family="IBM Plex Sans" fill="#0B3D33">${esc(r.label)}</text>`;
+      if (on) g += `<rect x="${x - 6}" y="${B + 8}" width="${w * 2 + 16}" height="20" rx="10" fill="none" stroke="#0B3D33" stroke-width="1.5"/>`;
     });
     return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Entradas e saídas por mês">${g}</svg>`;
   }
@@ -684,24 +690,24 @@
     const line = pts.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
     const contrib = pts.map((v, i) => `${x(i).toFixed(1)},${y(Math.min(pts[0] + monthly * i, max)).toFixed(1)}`).join(' ');
     let g = '';
-    for (let k = 0; k <= 4; k++) { const v = (max / 4) * k; g += `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="#16161614"/><text x="${L - 8}" y="${y(v) + 4}" text-anchor="end" font-size="10" font-family="Inter" fill="#646464">${kfmt(v)}</text>`; }
+    for (let k = 0; k <= 4; k++) { const v = (max / 4) * k; g += `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="#0B3D3314"/><text x="${L - 8}" y="${y(v) + 4}" text-anchor="end" font-size="10" font-family="IBM Plex Sans" fill="#5B6B66">${kfmt(v)}</text>`; }
     const step = Math.max(1, Math.ceil(n / 8));
-    for (let i = 0; i <= n; i += step) g += `<text x="${x(i)}" y="${B + 18}" text-anchor="middle" font-size="10" font-family="Inter" fill="#646464">${i === 0 ? 'hoje' : i + 'm'}</text>`;
-    g += `<polygon points="${x(0)},${B} ${line} ${x(n)},${B}" fill="#C8FF2E" opacity=".55"/>`;
-    g += `<polyline points="${contrib}" fill="none" stroke="#580D14" stroke-width="2" stroke-dasharray="5 4"/>`;
-    g += `<polyline points="${line}" fill="none" stroke="#161616" stroke-width="3" stroke-linejoin="round"/>`;
-    g += `<line x1="${L}" x2="${W - R}" y1="${y(target)}" y2="${y(target)}" stroke="#F8330B" stroke-width="2.5" stroke-dasharray="8 5"/>`;
-    g += `<rect x="${W - R - 78}" y="${y(target) - 24}" width="78" height="20" rx="6" fill="#F8330B" stroke="#161616" stroke-width="1.5"/><text x="${W - R - 39}" y="${y(target) - 10}" text-anchor="middle" font-size="11" font-weight="800" font-family="Inter" fill="#fff">META ${kfmt(target)}</text>`;
-    g += `<circle cx="${x(n)}" cy="${y(pts[n])}" r="6" fill="#C8FF2E" stroke="#161616" stroke-width="2.5"/>`;
+    for (let i = 0; i <= n; i += step) g += `<text x="${x(i)}" y="${B + 18}" text-anchor="middle" font-size="10" font-family="IBM Plex Sans" fill="#5B6B66">${i === 0 ? 'hoje' : i + 'm'}</text>`;
+    g += `<polygon points="${x(0)},${B} ${line} ${x(n)},${B}" fill="#3DBA85" opacity=".18"/>`;
+    g += `<polyline points="${contrib}" fill="none" stroke="#3E5C76" stroke-width="2" stroke-dasharray="5 4"/>`;
+    g += `<polyline points="${line}" fill="none" stroke="#0B3D33" stroke-width="2.25" stroke-linejoin="round"/>`;
+    g += `<line x1="${L}" x2="${W - R}" y1="${y(target)}" y2="${y(target)}" stroke="#D4553A" stroke-width="2.5" stroke-dasharray="8 5"/>`;
+    g += `<rect x="${W - R - 78}" y="${y(target) - 24}" width="78" height="20" rx="4" fill="#D4553A"/><text x="${W - R - 39}" y="${y(target) - 10}" text-anchor="middle" font-size="11" font-weight="800" font-family="IBM Plex Sans" fill="#fff">META ${kfmt(target)}</text>`;
+    g += `<circle cx="${x(n)}" cy="${y(pts[n])}" r="5" fill="#fff" stroke="#0B3D33" stroke-width="2.25"/>`;
     return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Projeção da caixinha">${g}</svg>`;
   }
 
-  function ring(value, size = 128, color = '#C8FF2E', track = 'rgba(255,255,255,.15)', text = '') {
+  function ring(value, size = 128, color = '#3DBA85', track = 'rgba(255,255,255,.15)', text = '') {
     const R = 46, C = 2 * Math.PI * R, len = clamp(value, 0, 1) * C;
     return `<svg class="score-ring" viewBox="0 0 120 120" width="${size}" height="${size}"><circle cx="60" cy="60" r="${R}" fill="none" stroke="${track}" stroke-width="14"/><circle cx="60" cy="60" r="${R}" fill="none" stroke="${color}" stroke-width="14" stroke-linecap="round" stroke-dasharray="${len} ${C}" transform="rotate(-90 60 60)"/>${text}</svg>`;
   }
 
-  const hbars = (rows, color = '#161616') => {
+  const hbars = (rows, color = '#0B3D33') => {
     const max = Math.max(1, ...rows.map((r) => r.value));
     return `<div class="rule-bars">${rows.map((r) => `<div class="rule-bar"><div class="rb-top"><span>${r.label}</span><b>${brl(r.value)}</b></div><div class="progress"><i style="width:${(r.value / max) * 100}%;background:${r.color || color}"></i></div></div>`).join('')}</div>`;
   };
@@ -731,12 +737,12 @@
   function goalCard(g) {
     const sim = simulate(g.target, g.saved, g.monthly, g.rate);
     const p = clamp(g.saved / g.target, 0, 1);
-    const dark = ['#580D14', '#161616', '#F8330B'].includes(g.color);
+    const dark = ['#3E5C76', '#0B3D33', '#D4553A'].includes(g.color);
     const eta = sim.months === 0 ? '🎉 Meta batida! Hora de resgatar ou criar a próxima.' : sim.months === Infinity ? 'Defina um aporte mensal para calcular a data.' : `Guardando <b>${brl0(g.monthly)}/mês</b>${g.rate ? ` a ${String(g.rate).replace('.', ',')}% a.a.` : ''}, você chega lá em <b>${monthsTxt(sim.months)}</b> (${monthYear(addMonths(sim.months))}).`;
     return `<article class="goal">
-      <div class="goal-top" style="background:${g.color};color:${dark ? '#fff' : '#161616'}">
+      <div class="goal-top" style="background:${g.color};color:${dark ? '#fff' : '#0B3D33'}">
         <span class="emoji">${g.emoji}</span><h4>${esc(g.name)}</h4>
-        <span class="pill pct" style="transform:rotate(4deg)">${Math.round(p * 100)}%</span>
+        <span class="pill pct">${Math.round(p * 100)}%</span>
       </div>
       <div class="goal-body">
         <div class="nums"><b>${brl(g.saved)}</b><span class="muted" style="font-size:.82rem">de ${brl0(g.target)}</span></div>
@@ -784,13 +790,14 @@
     const ym = UI.ym, st = monthStats(ym), pv = monthStats(shiftYm(ym, -1));
     const bal = sum(S.accounts, accBalance);
     const goals = sum(S.goals, (g) => g.saved);
+    const invested = sum(S.investments || [], (x) => x.currencyCode === 'BRL' ? x.balance : 0);
     const inv = sum(S.cards, limitUsed);
     const sc = calcScore();
     const tips = genTips(ym);
     const cats = Object.entries(st.byCat).sort((a, b) => b[1] - a[1]);
     const top = cats.slice(0, 6).map(([c, v]) => ({ key: c, label: cat(c).name, value: v, color: cat(c).color }));
     const rest = sum(cats.slice(6), (e) => e[1]);
-    if (rest > 0) top.push({ key: '', label: 'Demais', value: rest, color: '#d9d9d9' });
+    if (rest > 0) top.push({ key: '', label: 'Demais', value: rest, color: '#C9D3CF' });
     const delta = (a, b) => (b ? (a / b - 1) : 0);
     const pj = projCat(ym);
     const dExp = delta(pj.total, pv.expense);
@@ -806,20 +813,21 @@
     <div class="grid g-main">
       <section class="hero-balance">
         <div>
-          <div class="label">Saldo em contas <button data-act="toggleHide" aria-label="Mostrar ou esconder valores" style="font-size:1rem;margin-left:6px;vertical-align:middle">${S.settings.hide ? '🙈' : '👁️'}</button></div>
+          <div class="label">Saldo em contas <button data-act="toggleHide" aria-label="Mostrar ou esconder valores" class="eye-toggle">${S.settings.hide ? 'Mostrar' : 'Ocultar'}</button></div>
           <div class="value">${brl(bal)}</div>
         </div>
         <div class="row">
-          <div>Em caixinhas<b>${brl0(goals)}</b></div>
+          <div>Metas do Finaxis<b>${brl0(goals)}</b></div>
+          <div>Investimentos bancÃ¡rios<b>${brl0(invested)}</b></div>
           <div>Faturas em aberto<b>${brl0(inv)}</b></div>
-          <div>Patrimônio líquido<b>${brl0(bal + goals - inv)}</b></div>
+          <div>Patrimônio líquido<b>${brl0(bal + goals + invested - inv)}</b></div>
         </div>
       </section>
       <section class="score-card">
-        ${ring(sc.score / 1000, 128, '#C8FF2E', 'rgba(255,255,255,.15)', `<text x="60" y="62" text-anchor="middle" font-family="Highway Motel Sans, sans-serif" font-size="26" font-weight="900" fill="#fff">${sc.score}</text><text x="60" y="80" text-anchor="middle" font-family="Inter" font-size="9" font-weight="700" fill="#C8FF2E">DE 1000</text>`)}
+        ${ring(sc.score / 1000, 128, '#1E8A5F', '#E6EEEB', `<text x="60" y="62" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="26" font-weight="600" fill="#10231E">${sc.score}</text><text x="60" y="80" text-anchor="middle" font-family="IBM Plex Sans" font-size="9" font-weight="600" fill="#5B6B66">de 1000</text>`)}
         <div><span class="tag tag-live">Finaxis Score</span><h3 style="margin-top:8px">${sc.label}</h3>
         <p>Baseado em quanto você poupa, no respeito aos orçamentos, na reserva de emergência e no peso das contas fixas.</p>
-        <button class="link" data-go="aprender" style="color:#C8FF2E;margin-top:8px">Como subir meu score →</button></div>
+        <button class="link" data-go="aprender" style="margin-top:8px">Como melhorar meu score</button></div>
       </section>
     </div>
 
@@ -843,7 +851,7 @@
 
     <div class="grid g-main" style="margin-top:20px">
       <section class="card">
-        <div class="card-head"><div><h3>Fluxo dos últimos 6 meses</h3><span class="sub">Entradas x saídas</span></div><div class="chart-legend"><span><i style="background:#C8FF2E"></i>Entradas</span><span><i style="background:#F8330B"></i>Saídas</span></div></div>
+        <div class="card-head"><div><h3>Fluxo dos últimos 6 meses</h3><span class="sub">Entradas x saídas</span></div><div class="chart-legend"><span><i style="background:#3DBA85"></i>Entradas</span><span><i style="background:#D4553A"></i>Saídas</span></div></div>
         <div class="chart-wrap">${barChart(rows, 5)}</div>
       </section>
       <section class="card">
@@ -858,7 +866,7 @@
         <div class="tx-list">${last.length ? last.map(txRow).join('') : emptyBox('Sem transações. Conecte um banco ou lance manualmente.', '<button class="btn btn-lime btn-sm" data-act="connectBank">Conectar banco</button>')}</div>
       </section>
       <div class="stack">
-        ${tip ? `<section class="tip-hero"><img src="${MASCOT}" alt=""><div><b>Dica do Fini</b><p><strong>${esc(tip.title)}.</strong> ${esc(tip.text)}</p><button class="link" data-go="aprender" style="margin-top:6px">Mais ${Math.max(0, tips.length - 1)} dicas →</button></div></section>` : ''}
+        ${tip ? `<section class="tip-hero"><img src="${MASCOT}" alt=""><div><b>Dica do mês</b><p><strong>${esc(tip.title)}.</strong> ${esc(tip.text)}</p><button class="link" data-go="aprender" style="margin-top:6px">Mais ${Math.max(0, tips.length - 1)} dicas →</button></div></section>` : ''}
         <section class="card">
           <div class="card-head"><h3>Orçamentos</h3><button class="link" data-go="orcamentos">Ajustar</button></div>
           ${budgets.length ? budgets.map((b) => budgetRow(b.c, b.v, b.lim, ym)).join('') : emptyBox('Defina limites por categoria.', '<button class="btn btn-sm btn-lime" data-go="orcamentos">Criar orçamento</button>')}
@@ -906,7 +914,7 @@
     if (f.src) { const [k, id] = f.src.split(':'); list = list.filter((t) => (k === 'a' ? t.accountId === id : t.cardId === id)); }
     list.sort((a, b) => b.date.localeCompare(a.date) || (b.ts || 0) - (a.ts || 0));
     const inS = sum(list.filter((t) => t.amount > 0), (t) => t.amount), outS = -sum(list.filter((t) => t.amount < 0), (t) => t.amount);
-    $('#txSummary').innerHTML = `<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:6px"><span class="chip">${list.length} transações</span><span class="chip"><span class="chip-dot" style="background:#1f8a3b"></span>Entradas ${brl(inS)}</span><span class="chip"><span class="chip-dot" style="background:#F8330B"></span>Saídas ${brl(outS)}</span></div>`;
+    $('#txSummary').innerHTML = `<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:6px"><span class="chip">${list.length} transações</span><span class="chip"><span class="chip-dot" style="background:#2E9E6B"></span>Entradas ${brl(inS)}</span><span class="chip"><span class="chip-dot" style="background:#D4553A"></span>Saídas ${brl(outS)}</span></div>`;
     if (!list.length) { box.innerHTML = emptyBox('Nenhuma transação encontrada com esses filtros.'); return; }
     let html = '', cur = '';
     const groups = {};
@@ -935,11 +943,11 @@
       const curYm = ymOf(now());
       const open = invoiceTotal(c, curYm), used = limitUsed(c), inv = openInvoices(c).filter((i) => i.ym < curYm);
       return `<div class="stack" style="gap:12px">
-        <article class="bank-card" style="background:#161616">
+        <article class="bank-card" style="background:#0B3D33">
           <div class="bc-top"><div style="display:flex;gap:12px;align-items:center"><span class="bank-logo" style="background:${b.color};border-color:#fff">${b.short}</span><div class="bc-name">${esc(c.name)}</div></div><span style="font-weight:800;font-size:.85rem">${esc(c.brand || '')}</span></div>
           <div style="display:flex;align-items:center;gap:14px;position:relative;z-index:1"><span class="chipimg"></span><span class="bc-num">•••• •••• •••• ${esc(c.last4 || '0000')}</span></div>
           <div class="bc-bottom"><div><small>Fatura atual (aberta)</small><b>${brl(open)}</b></div><div style="text-align:right"><small>Vence dia</small><b>${c.dueDay}</b></div></div>
-          <div style="position:relative;z-index:1"><div class="progress"><i style="width:${c.limit ? clamp(used / c.limit, 0, 1) * 100 : 0}%;background:${used / c.limit > 0.7 ? '#F8330B' : '#C8FF2E'}"></i></div><span style="font-size:.72rem;opacity:.9;display:block;margin-top:6px">Limite usado ${brl0(used)} de ${brl0(c.limit)} · disponível ${brl0(Math.max(0, c.limit - used))}</span></div>
+          <div style="position:relative;z-index:1"><div class="progress"><i style="width:${c.limit ? clamp(used / c.limit, 0, 1) * 100 : 0}%;background:${used / c.limit > 0.7 ? '#D4553A' : '#3DBA85'}"></i></div><span style="font-size:.72rem;opacity:.9;display:block;margin-top:6px">Limite usado ${brl0(used)} de ${brl0(c.limit)} · disponível ${brl0(Math.max(0, c.limit - used))}</span></div>
         </article>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <button class="btn btn-sm" data-act="viewCard" data-id="${c.id}">Ver fatura</button>
@@ -973,7 +981,7 @@
     const need = sum(Object.entries(pj).filter(([c]) => cat(c).group === 'need'), (e) => e[1]);
     const want = sum(Object.entries(pj).filter(([c]) => cat(c).group === 'want'), (e) => e[1]);
     const savedTot = Math.max(0, inc - need - want);
-    const rule = (label, val, ideal, color, txt) => `<div class="rule-bar"><div class="rb-top"><span><b>${label}</b> · ${txt}</span><span>${brl0(val)} <span class="muted">/ ideal ${brl0(ideal)}</span></span></div><div class="progress ${val > ideal && color !== '#C8FF2E' ? 'over' : ''}"><i style="width:${ideal ? clamp(val / ideal, 0, 1) * 100 : 0}%;background:${color}"></i></div></div>`;
+    const rule = (label, val, ideal, color, txt) => `<div class="rule-bar"><div class="rb-top"><span><b>${label}</b> · ${txt}</span><span>${brl0(val)} <span class="muted">/ ideal ${brl0(ideal)}</span></span></div><div class="progress ${val > ideal && color !== '#3DBA85' ? 'over' : ''}"><i style="width:${ideal ? clamp(val / ideal, 0, 1) * 100 : 0}%;background:${color}"></i></div></div>`;
     const withB = Object.keys(S.budgets);
     const noB = EXP_CATS.filter((c) => !S.budgets[c] && st.byCat[c]);
     return `
@@ -987,9 +995,9 @@
         <section class="card cream">
           <div class="card-head"><div><h3>Regra 50/30/20</h3><span class="sub">Renda de ${brl0(inc)}${isCurrent(ym) ? ' · projeção de fechamento do mês' : ''}</span></div></div>
           ${inc ? `<div class="rule-bars">
-            ${rule('50%', need, inc * 0.5, '#161616', 'Necessidades')}
-            ${rule('30%', want, inc * 0.3, '#F8330B', 'Desejos')}
-            ${rule('20%', savedTot, inc * 0.2, '#C8FF2E', 'Poupança e metas')}
+            ${rule('50%', need, inc * 0.5, '#0B3D33', 'Necessidades')}
+            ${rule('30%', want, inc * 0.3, '#D4553A', 'Desejos')}
+            ${rule('20%', savedTot, inc * 0.2, '#3DBA85', 'Poupança e metas')}
           </div><p class="muted" style="font-size:.8rem;margin-top:14px;line-height:1.5">Necessidades: moradia, mercado, contas, transporte, saúde, educação. Desejos: delivery, compras, lazer, assinaturas, viagens.</p>` : emptyBox('Informe seu salário em Ajustes para calcular.', '<button class="btn btn-sm btn-lime" data-go="ajustes">Informar salário</button>')}
         </section>
         <section class="tip-hero"><img src="${MASCOT}" alt=""><div><b>Como funciona</b><p>Você recebe um alerta quando uma categoria passa de 80% do limite. O app também mostra quanto dá para gastar por dia até o fim do mês.</p></div></section>
@@ -1000,6 +1008,8 @@
   V.caixinhas = () => {
     const g = UI.simGoal === '__free' ? null : (S.goals.find((x) => x.id === UI.simGoal) || S.goals[0]);
     const totalSaved = sum(S.goals, (x) => x.saved), totalMonthly = sum(S.goals, (x) => x.monthly);
+    const investments = S.investments || [];
+    const investmentTotal = sum(investments, (x) => x.currencyCode === 'BRL' ? x.balance : 0);
     const deliv = avgExpenses(3, (c) => c === 'alimentacao');
     return `
     <div class="grid g-3" style="margin-bottom:20px">
@@ -1007,6 +1017,10 @@
       <div class="card kpi"><div class="k-label">Aportes por mês</div><div class="k-value">${brl(totalMonthly)}</div><div class="k-foot muted">${S.profile.salary ? pct(totalMonthly / S.profile.salary) + ' do salário' : ''}</div></div>
       <div class="card kpi"><div class="k-label">Rendimento estimado em 12 meses</div><div class="k-value">${brl0(sum(S.goals, (x) => { const i = Math.pow(1 + (x.rate || 0) / 100, 1 / 12) - 1; let b = x.saved; for (let k = 0; k < 12; k++) b = b * (1 + i) + x.monthly; return b - x.saved - x.monthly * 12; }))}</div><div class="k-foot">Juros compostos trabalhando por você</div></div>
     </div>
+    <section class="card" style="margin-bottom:20px">
+      <div class="card-head"><div><h3>Investimentos e caixinhas dos bancos</h3><span class="sub">Saldo informado pela instituiÃ§Ã£o conectada</span></div><b>${brl(investmentTotal)}</b></div>
+      ${investments.length ? `<div class="stack" style="gap:8px">${investments.map((x) => `<div class="bill"><div class="bank-logo" style="background:${esc(x.bankColor || '#0B3D33')}">${esc((x.bankName || 'BN').slice(0, 2))}</div><div class="bill-info"><b>${esc(x.name)}</b><span>${esc(x.bankName || x.issuer || 'InstituiÃ§Ã£o')} Â· ${esc([x.subtype, x.rateType && x.rate != null ? `${x.rate}% ${x.rateType}` : ''].filter(Boolean).join(' Â· ') || x.type)}</span></div><div class="bill-amt">${moneyIn(x.balance, x.currencyCode)}</div></div>`).join('')}</div>` : `<p class="muted" style="font-size:.86rem;line-height:1.5">Nenhum investimento foi retornado pelas conexÃµes. Ao conectar o banco, autorize investimentos se essa opÃ§Ã£o aparecer. A disponibilidade depende do banco e do plano Pluggy. Estes valores sÃ£o somente leitura; as metas do Finaxis abaixo sÃ£o controles separados.</p>`}
+    </section>
     <div class="grid g-3">${S.goals.map(goalCard).join('')}
       <button class="goal-new" data-act="newGoal"><div><div class="plus">+</div><b class="display" style="font-size:1.2rem">Nova caixinha</b><p class="muted" style="font-size:.84rem;margin-top:6px">Viagem, carro, casamento, reserva…</p></div></button>
     </div>
@@ -1023,7 +1037,7 @@
         </div>
         <div>
           <div class="chart-wrap" id="simChart"></div>
-          <div class="chart-legend" style="margin-top:8px"><span><i style="background:#C8FF2E"></i>Saldo com rendimento</span><span><i style="background:#580D14"></i>Só aportes</span><span><i style="background:#F8330B"></i>Meta</span></div>
+          <div class="chart-legend" style="margin-top:8px"><span><i style="background:#3DBA85"></i>Saldo com rendimento</span><span><i style="background:#3E5C76"></i>Só aportes</span><span><i style="background:#D4553A"></i>Meta</span></div>
           <h4 class="display" style="font-size:1rem;margin:20px 0 10px">E se…</h4>
           <div id="simWhatIf" class="stack" style="gap:8px"></div>
           ${deliv > 100 ? `<div class="goal-eta" style="margin-top:12px">🍔 Você gasta em média <b>${brl0(deliv)}/mês</b> com alimentação fora. Cortando 30% e mandando para cá, são <b>+${brl0(deliv * 0.3)}/mês</b> na meta.</div>` : ''}
@@ -1040,17 +1054,17 @@
       $('#sRateV').textContent = String(rate).replace('.', ',') + '%';
       const r = simulate(target, saved, monthly, rate);
       const d = addMonths(r.months === Infinity ? 0 : r.months);
-      $('#simOut').innerHTML = `<span class="tag" style="background:#C8FF2E;color:#161616;align-self:flex-start">Você chega lá em</span>
+      $('#simOut').innerHTML = `<span class="tag tag-light" style="align-self:flex-start">Você chega lá em</span>
         <div class="big">${r.months === Infinity ? '∞' : r.months === 0 ? 'JÁ!' : monthsTxt(r.months).toUpperCase()}</div>
         <div>${r.months === Infinity ? 'Com aporte zero e sem rendimento, a meta não anda. Coloque qualquer valor mensal.' : r.months === 0 ? 'Você já tem o valor da meta. 🎉' : `Previsão: <b>${monthYear(d)}</b>`}</div>
-        ${r.months !== Infinity && r.months > 0 ? `<div class="row"><div>Você deposita<b>${brlRaw(monthly * r.months, 0)}</b></div><div>Rendimento<b style="color:#C8FF2E">+${brlRaw(r.interest, 0)}</b></div><div>Saldo final<b>${brlRaw(r.final, 0)}</b></div></div>` : ''}`;
+        ${r.months !== Infinity && r.months > 0 ? `<div class="row"><div>Você deposita<b>${brlRaw(monthly * r.months, 0)}</b></div><div>Rendimento<b style="color:#3DBA85">+${brlRaw(r.interest, 0)}</b></div><div>Saldo final<b>${brlRaw(r.final, 0)}</b></div></div>` : ''}`;
       const pts = r.months === Infinity ? Array.from({ length: 13 }, (_, i) => saved) : r.pts;
       $('#simChart').innerHTML = projChart(pts.length > 1 ? pts : [saved, saved], target, monthly);
       const base = r.months;
       $('#simWhatIf').innerHTML = [50, 100, 250].map((x) => {
         const r2 = simulate(target, saved, monthly + x, rate);
         const gain = base === Infinity ? null : base - r2.months;
-        return `<div class="bill"><div class="tx-ico" style="background:#C8FF2E">+</div><div class="bill-info"><b>Guardar +${brlRaw(x, 0)} por mês</b><span>${r2.months === 0 ? 'meta já batida' : `chega em ${monthsTxt(r2.months)}`}</span></div><div class="bill-amt pos">${gain == null ? '—' : gain > 0 ? `−${gain} ${gain === 1 ? 'mês' : 'meses'}` : '='}</div></div>`;
+        return `<div class="bill"><div class="tx-ico" style="background:#3DBA85">+</div><div class="bill-info"><b>Guardar +${brlRaw(x, 0)} por mês</b><span>${r2.months === 0 ? 'meta já batida' : `chega em ${monthsTxt(r2.months)}`}</span></div><div class="bill-amt pos">${gain == null ? '—' : gain > 0 ? `−${gain} ${gain === 1 ? 'mês' : 'meses'}` : '='}</div></div>`;
       }).join('');
     };
     ids.forEach((id) => $('#' + id).addEventListener('input', run));
@@ -1081,7 +1095,7 @@
     return `
     <div class="grid g-main">
       <section class="card">
-        <div class="card-head"><div><h3>${ymLabel(ym)}</h3><span class="sub">Vencimentos, salário e aportes automáticos</span></div><div class="chart-legend"><span><i style="background:#F8330B"></i>Conta</span><span><i style="background:#580D14"></i>Fatura</span><span><i style="background:#C8FF2E"></i>Entrada/caixinha</span></div></div>
+        <div class="card-head"><div><h3>${ymLabel(ym)}</h3><span class="sub">Vencimentos, salário e aportes automáticos</span></div><div class="chart-legend"><span><i style="background:#D4553A"></i>Conta</span><span><i style="background:#3E5C76"></i>Fatura</span><span><i style="background:#3DBA85"></i>Entrada/caixinha</span></div></div>
         <div class="cal">${cells}</div>
       </section>
       <div class="stack">
@@ -1118,8 +1132,8 @@
       <section class="card">
         <div class="card-head"><div><h3>Categoria a categoria</h3><span class="sub">${ymLabel(ym)} vs ${ymLabel(pvYm)}</span></div></div>
         <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:.88rem;min-width:420px">
-          <thead><tr style="text-align:left;font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:#646464"><th style="padding:8px 4px">Categoria</th><th style="text-align:right">${ymShort(pvYm)}</th><th style="text-align:right">${ymShort(ym)}</th><th style="text-align:right;padding-right:4px">${cur ? 'Tendência*' : 'Variação'}</th></tr></thead>
-          <tbody>${allCats.map((c) => { const a = pv.byCat[c] || 0, b = st.byCat[c] || 0, bp = pj.byCat[c] || 0, d = a ? (bp - a) / a : null; return `<tr style="border-top:1px dashed rgba(22,22,22,.15)"><td style="padding:10px 4px;font-weight:600">${catIco(c)} ${esc(cat(c).name)}</td><td style="text-align:right">${brl0(a)}</td><td style="text-align:right;font-weight:700">${brl0(b)}</td><td style="text-align:right;padding-right:4px">${d == null ? '<span class="chip">novo</span>' : `<span class="chip" style="background:${d > 0.05 ? '#F8330B' : d < -0.05 ? '#C8FF2E' : '#fff'};color:${d > 0.05 ? '#fff' : '#161616'}">${d > 0 ? '▲' : '▼'} ${Math.abs(Math.round(d * 100))}%</span>`}</td></tr>`; }).join('')}</tbody>
+          <thead><tr style="text-align:left;font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:#5B6B66"><th style="padding:8px 4px">Categoria</th><th style="text-align:right">${ymShort(pvYm)}</th><th style="text-align:right">${ymShort(ym)}</th><th style="text-align:right;padding-right:4px">${cur ? 'Tendência*' : 'Variação'}</th></tr></thead>
+          <tbody>${allCats.map((c) => { const a = pv.byCat[c] || 0, b = st.byCat[c] || 0, bp = pj.byCat[c] || 0, d = a ? (bp - a) / a : null; return `<tr style="border-top:1px dashed rgba(11,61,51,.12)"><td style="padding:10px 4px;font-weight:600">${catIco(c)} ${esc(cat(c).name)}</td><td style="text-align:right">${brl0(a)}</td><td style="text-align:right;font-weight:700">${brl0(b)}</td><td style="text-align:right;padding-right:4px">${d == null ? '<span class="chip">novo</span>' : `<span class="chip" style="background:${d > 0.05 ? '#D4553A' : d < -0.05 ? '#3DBA85' : '#fff'};color:${d > 0.05 ? '#fff' : '#0B3D33'}">${d > 0 ? '▲' : '▼'} ${Math.abs(Math.round(d * 100))}%</span>`}</td></tr>`; }).join('')}</tbody>
         </table></div>${cur ? '<p class="muted" style="font-size:.74rem;margin-top:10px">* Tendência compara a projeção de fechamento do mês (ritmo atual + contas fixas que ainda vão cair) com o mês anterior.</p>' : ''}
       </section>
       <div class="stack">
@@ -1127,21 +1141,21 @@
         <section class="card cream"><div class="card-head"><h3>Por forma de pagamento</h3></div>${methods.length ? hbars(methods.map(([k, v]) => ({ label: `${methodIco(k)} ${(METHODS[k] || { name: k }).name}`, value: v }))) : emptyBox('Sem gastos.')}</section>
       </div>
     </div>
-    <section class="card" style="margin-top:20px"><div class="card-head"><div><h3>Evolução</h3><span class="sub">6 meses até ${ymLabel(ym)}</span></div><div class="chart-legend"><span><i style="background:#C8FF2E"></i>Entradas</span><span><i style="background:#F8330B"></i>Saídas</span></div></div><div class="chart-wrap">${barChart(rows, 5)}</div></section>`;
+    <section class="card" style="margin-top:20px"><div class="card-head"><div><h3>Evolução</h3><span class="sub">6 meses até ${ymLabel(ym)}</span></div><div class="chart-legend"><span><i style="background:#3DBA85"></i>Entradas</span><span><i style="background:#D4553A"></i>Saídas</span></div></div><div class="chart-wrap">${barChart(rows, 5)}</div></section>`;
   };
 
   const COURSES = [
-    { id: 'c1', title: 'Primeiros passos', color: '#F8330B', emoji: '🚀', lessons: [
+    { id: 'c1', title: 'Primeiros passos', color: '#D4553A', emoji: '🚀', lessons: [
       { id: 'l1', t: 'Pague-se primeiro', body: ['A maioria das pessoas tenta guardar o que sobra no fim do mês. O problema: quase nunca sobra. A ideia de “pagar-se primeiro” inverte a ordem: assim que o salário cai, uma parte vai direto para a sua caixinha, como se fosse uma conta obrigatória.', 'Comece pequeno. 5% da renda já cria o hábito; depois aumente 1 ponto por mês até chegar a 15 ou 20%.'], tip: 'No Finaxis, ative o aporte automático da caixinha para o dia seguinte ao salário.' },
       { id: 'l2', t: 'A regra 50/30/20', body: ['É um jeito simples de dividir a renda líquida: 50% para necessidades (moradia, mercado, contas, transporte), 30% para desejos (delivery, compras, lazer) e 20% para o futuro (reserva, metas, investimentos).', 'Ela não é lei. Se o aluguel come metade do salário, ajuste para 60/20/20, mas mantenha a parte do futuro sempre visível.'], tip: 'A aba Orçamentos compara seus gastos reais com essa divisão automaticamente.' },
       { id: 'l3', t: 'Reserva de emergência', body: ['A reserva é o dinheiro que impede uma emergência (demissão, problema de saúde, conserto do carro) de virar dívida. O alvo comum é de 3 a 6 meses dos seus gastos essenciais.', 'Ela precisa ficar num lugar seguro e com resgate rápido, como um CDB de liquidez diária ou o Tesouro Selic. Rentabilidade aqui é secundária.'], tip: 'Crie uma caixinha do tipo “reserva”: ela conta para o seu Finaxis Score.' },
     ] },
-    { id: 'c2', title: 'Cartão sem sustos', color: '#580D14', emoji: '💳', lessons: [
+    { id: 'c2', title: 'Cartão sem sustos', color: '#3E5C76', emoji: '💳', lessons: [
       { id: 'l4', t: 'Como funciona a fatura', body: ['O cartão tem duas datas: fechamento e vencimento. Tudo o que você compra depois do fechamento só entra na fatura seguinte, e por isso comprar logo após o fechamento dá quase 40 dias até pagar.', 'Acompanhar a fatura aberta durante o mês evita a surpresa do “como gastei tudo isso?”.'], tip: 'Em Contas & cartões você vê a fatura atual e o limite usado em tempo real.' },
       { id: 'l5', t: 'Rotativo: o vilão', body: ['Pagar o mínimo da fatura joga o resto no crédito rotativo, uma das linhas de crédito mais caras do país, com juros que podem passar de 400% ao ano.', 'Se não der para pagar tudo, compare o parcelamento da fatura com um empréstimo pessoal mais barato. Qualquer opção costuma ser melhor que o rotativo.'], tip: 'Ative os lembretes de vencimento em Ajustes.' },
       { id: 'l6', t: 'Parcelar ou não?', body: ['Parcelar sem juros não é dinheiro grátis: cada parcela compromete a renda dos próximos meses. Somadas, várias parcelas pequenas viram uma conta fixa grande.', 'Regra prática: só parcele se a soma de todas as parcelas abertas couber em até 15% da sua renda mensal.'], tip: 'Ao lançar uma compra no crédito, use o campo de parcelas para ver o impacto nos meses seguintes.' },
     ] },
-    { id: 'c3', title: 'Fazendo render', color: '#161616', emoji: '📈', lessons: [
+    { id: 'c3', title: 'Fazendo render', color: '#0B3D33', emoji: '📈', lessons: [
       { id: 'l7', t: 'Poupança, CDB ou Tesouro?', body: ['A poupança é simples, mas costuma render menos que alternativas igualmente seguras. CDBs que pagam 100% do CDI ou mais e o Tesouro Selic geralmente rendem mais, com garantia do FGC (no CDB) ou do Tesouro Nacional.', 'Fique atento ao Imposto de Renda, que é regressivo: quanto mais tempo o dinheiro fica aplicado, menor a alíquota.'], tip: 'O simulador de caixinhas permite comparar rendimentos: teste 6% x 10,5% ao ano.' },
       { id: 'l8', t: 'Juros compostos', body: ['Nos juros compostos, o rendimento de hoje também rende amanhã. No começo a diferença é pequena; com o tempo, a curva acelera.', 'Por isso começar cedo com pouco costuma valer mais do que começar tarde com muito.'], tip: 'No gráfico do simulador, a distância entre a linha cheia e a tracejada é o efeito dos juros.' },
       { id: 'l9', t: 'Metas SMART', body: ['Uma meta boa é específica, mensurável, atingível, relevante e tem prazo. “Juntar dinheiro” vira “juntar R$ 8.000 para a viagem ao Chile até julho”.', 'Com valor e prazo definidos, o aporte mensal necessário fica claro, e dá para acompanhar o progresso todo mês.'], tip: 'Cada caixinha do Finaxis já é uma meta SMART: valor, aporte e data prevista.' },
@@ -1162,11 +1176,11 @@
     <div class="grid g-main">
       <section class="card">
         <div class="card-head"><div><h3>Dicas para você</h3><span class="sub">Geradas a partir dos seus gastos de ${ymLabel(UI.ym).toLowerCase()}</span></div><span class="chip">${tips.length} dicas</span></div>
-        ${tips.map((t) => `<div class="tip ${t.kind}"><div class="t-ico">${uiIco(t.ico)}</div><div><b>${esc(t.title)}</b><p>${esc(t.text)}</p>${t.save ? `<span class="chip t-save" style="background:#C8FF2E">Potencial: ${brl0(t.save)}/mês</span>` : ''}</div></div>`).join('') || emptyBox('Tudo em ordem por aqui! 🎉')}
+        ${tips.map((t) => `<div class="tip ${t.kind}"><div class="t-ico">${uiIco(t.ico)}</div><div><b>${esc(t.title)}</b><p>${esc(t.text)}</p>${t.save ? `<span class="chip t-save chip-pos">Potencial: ${brl0(t.save)}/mês</span>` : ''}</div></div>`).join('') || emptyBox('Tudo em ordem por aqui! 🎉')}
       </section>
       <div class="stack">
         <section class="score-card" style="flex-direction:row">
-          ${ring(inLvl / 300, 110, '#C8FF2E', 'rgba(255,255,255,.15)', `<text x="60" y="58" text-anchor="middle" font-family="Inter" font-size="10" font-weight="700" fill="#C8FF2E">NÍVEL</text><text x="60" y="82" text-anchor="middle" font-family="Highway Motel Sans, sans-serif" font-size="30" font-weight="900" fill="#fff">${lvl}</text>`)}
+          ${ring(inLvl / 300, 110, '#1E8A5F', '#E6EEEB', `<text x="60" y="58" text-anchor="middle" font-family="IBM Plex Sans" font-size="10" font-weight="600" fill="#5B6B66">Nível</text><text x="60" y="82" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="30" font-weight="600" fill="#10231E">${lvl}</text>`)}
           <div><h3>${S.learn.xp} XP</h3><p>${S.learn.done.length}/${allLessons.length} aulas concluídas. Faltam ${300 - inLvl} XP para o nível ${lvl + 1}.</p></div>
         </section>
         <section class="card cream">
@@ -1180,7 +1194,7 @@
               const failed = ch.check && !ch.check(st.joined);
               const done = st.done || (!failed && days >= ch.days);
               const p = done ? 1 : clamp(days / ch.days, 0, 1);
-              body = failed ? `<span class="chip" style="background:#F8330B;color:#fff">Quebrou 😅</span> <button class="link" data-act="joinCh" data-id="${ch.id}">Recomeçar</button>` : done ? `<span class="chip" style="background:#C8FF2E">Concluído ✓</span>` : `<div class="progress" style="height:9px"><i style="width:${Math.max(4, p * 100)}%"></i></div><span class="muted" style="font-size:.72rem">${days} de ${ch.days} dias</span> ${ch.days <= 3 ? `<button class="link" data-act="doneCh" data-id="${ch.id}">Marcar como feito</button>` : ''}`;
+              body = failed ? `<span class="chip" style="background:#D4553A;color:#fff">Quebrou 😅</span> <button class="link" data-act="joinCh" data-id="${ch.id}">Recomeçar</button>` : done ? `<span class="chip chip-pos">Concluído ✓</span>` : `<div class="progress" style="height:9px"><i style="width:${Math.max(4, p * 100)}%"></i></div><span class="muted" style="font-size:.72rem">${days} de ${ch.days} dias</span> ${ch.days <= 3 ? `<button class="link" data-act="doneCh" data-id="${ch.id}">Marcar como feito</button>` : ''}`;
             }
             return `<div class="challenge"><div class="c-ico">${uiIco(ch.ico)}</div><div class="c-main"><b>${ch.t}</b><p>${ch.d}</p>${body}</div><span class="xp">+${ch.xp}</span></div>`;
           }).join('')}
@@ -1188,13 +1202,13 @@
       </div>
     </div>
     <h3 class="display" style="font-size:1.4rem;margin:30px 0 14px">Trilhas de educação financeira</h3>
-    <div class="grid g-3">${COURSES.map((c) => { const done = c.lessons.filter((l) => S.learn.done.includes(l.id)).length; return `<article class="course"><div class="course-top" style="background:${c.color}"><span style="font-size:2rem">${c.emoji}</span><div><span class="tag" style="background:#C8FF2E;color:#161616">${done}/${c.lessons.length} aulas</span><h4 style="margin-top:8px">${c.title}</h4></div></div><div class="course-body">${c.lessons.map((l) => `<button class="lesson ${S.learn.done.includes(l.id) ? 'done' : ''}" data-act="openLesson" data-id="${l.id}"><span class="ck">${S.learn.done.includes(l.id) ? '✓' : ''}</span>${l.t}<span class="muted" style="margin-left:auto;font-size:.72rem">3 min</span></button>`).join('')}</div></article>`; }).join('')}</div>`;
+    <div class="grid g-3">${COURSES.map((c) => { const done = c.lessons.filter((l) => S.learn.done.includes(l.id)).length; return `<article class="course"><div class="course-top" style="background:${c.color}"><span style="font-size:2rem">${c.emoji}</span><div><span class="tag tag-light">${done}/${c.lessons.length} aulas</span><h4 style="margin-top:8px">${c.title}</h4></div></div><div class="course-body">${c.lessons.map((l) => `<button class="lesson ${S.learn.done.includes(l.id) ? 'done' : ''}" data-act="openLesson" data-id="${l.id}"><span class="ck">${S.learn.done.includes(l.id) ? '✓' : ''}</span>${l.t}<span class="muted" style="margin-left:auto;font-size:.72rem">3 min</span></button>`).join('')}</div></article>`; }).join('')}</div>`;
   };
 
   V.ajustes = () => `
     <div class="grid g-2">
       ${API.online ? `<section class="card span-2" style="display:flex;gap:18px;align-items:center;flex-wrap:wrap">
-        <img src="${MASCOT}" alt="" style="width:54px">
+        
         <div style="flex:1;min-width:200px"><h3 class="display" style="font-size:1.2rem">${esc(API.user.name)}</h3><p class="muted" style="font-size:.86rem;margin-top:4px">${esc(API.user.email)} · Open Finance: ${API.cfg.provider === 'pluggy' ? 'Pluggy' + (API.cfg.webhooks ? ' com webhooks' : ' (sincroniza ao abrir e periodicamente)') : 'modo demonstração'}</p></div>
         <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn btn-sm" data-act="logout">Sair</button><button class="btn btn-sm btn-ghost neg" data-act="deleteAccount">Excluir minha conta</button></div>
       </section>` : API.available ? `<section class="card span-2 cream" style="display:flex;gap:16px;align-items:center;flex-wrap:wrap"><div style="flex:1;min-width:220px"><h3 class="display" style="font-size:1.2rem">Modo local</h3><p class="muted" style="font-size:.86rem;margin-top:4px">Crie uma conta para salvar na nuvem, usar em vários dispositivos e conectar seus bancos.</p></div><button class="btn btn-lime btn-sm" data-act="goSignup">Criar conta</button></section>` : ''}
@@ -1345,7 +1359,7 @@
         const a = e.target.closest('[data-act-m]'); if (!a) return;
         if (a.dataset.actM === 'del') { if (confirm('Excluir esta transação?')) { S.tx = S.tx.filter((x) => x.id !== t.id); if (t.goalId) { const g = S.goals.find((x) => x.id === t.goalId); if (g) g.saved = Math.max(0, g.saved + t.amount); } closeModal(); commit(); toast('Transação excluída', '🗑'); } return; }
         const v = Math.abs(+$('#tAmt', m).value);
-        if (!v) { $('#tAmt', m).focus(); $('#tAmt', m).style.borderColor = '#F8330B'; return; }
+        if (!v) { $('#tAmt', m).focus(); $('#tAmt', m).style.borderColor = '#D4553A'; return; }
         const desc = $('#tDesc', m).value.trim() || cat(curCat).name;
         const [k, id] = $('#tSrc', m).value.split(':');
         const base = { desc, amount: income ? v : -v, date: $('#tDate', m).value || todayStr(), method: $('#tMethod', m).value, cat: sys ? tx.cat : curCat, accountId: k === 'a' ? id : undefined, cardId: k === 'c' ? id : undefined };
@@ -1382,13 +1396,13 @@
 
   function goalModal(g) {
     const isNew = !g;
-    const x = g || { name: '', emoji: '🎯', target: '', saved: 0, monthly: 200, rate: 10.5, color: '#F8330B', autoDay: Math.min(28, (S.profile.payday || 5) + 1), accountId: S.accounts[0].id };
+    const x = g || { name: '', emoji: '🎯', target: '', saved: 0, monthly: 200, rate: 10.5, color: '#D4553A', autoDay: Math.min(28, (S.profile.payday || 5) + 1), accountId: S.accounts[0].id };
     const EM = ['✈️', '🏠', '🚗', '🎮', '💍', '🛟', '🎓', '💻', '📱', '🏖️', '🐶', '🎯'];
-    const COLORS = ['#F8330B', '#C8FF2E', '#580D14', '#161616', '#FEFAE7'];
+    const COLORS = ['#D4553A', '#3DBA85', '#3E5C76', '#0B3D33', '#E6EEEB'];
     const body = `<div class="form-grid">
       <div class="field full"><label for="gName">Nome da caixinha</label><input class="input" id="gName" value="${esc(x.name)}" placeholder="Ex.: Viagem para o Chile"></div>
       <div class="field full"><label>Ícone</label><div class="cat-pick" id="gEm" style="grid-template-columns:repeat(auto-fill,minmax(44px,1fr))">${EM.map((e) => `<button type="button" data-em="${e}" class="${e === x.emoji ? 'on' : ''}"><span>${e}</span></button>`).join('')}</div></div>
-      <div class="field full"><label>Cor</label><div style="display:flex;gap:8px;flex-wrap:wrap" id="gCol">${COLORS.map((c) => `<button type="button" data-col="${c}" aria-label="Cor ${c}" style="width:34px;height:34px;border-radius:50%;background:${c};border:2px solid #161616;${c === x.color ? 'box-shadow:0 0 0 3px #F7F6F0,0 0 0 5px #161616' : ''}"></button>`).join('')}</div></div>
+      <div class="field full"><label>Cor</label><div style="display:flex;gap:8px;flex-wrap:wrap" id="gCol">${COLORS.map((c) => `<button type="button" data-col="${c}" aria-label="Cor ${c}" style="width:34px;height:34px;border-radius:50%;background:${c};border:2px solid #0B3D33;${c === x.color ? 'box-shadow:0 0 0 3px #F3F5F4,0 0 0 5px #0B3D33' : ''}"></button>`).join('')}</div></div>
       <div class="field"><label for="gTarget">Valor da meta</label><div class="input-money"><input class="input" id="gTarget" type="number" min="1" step="50" value="${x.target}"></div></div>
       <div class="field"><label for="gSaved">Já tenho guardado</label><div class="input-money"><input class="input" id="gSaved" type="number" min="0" step="50" value="${Math.round(x.saved)}" ${isNew ? '' : 'disabled'}></div>${isNew ? '' : '<span class="hint">Use Guardar/Resgatar para movimentar</span>'}</div>
       <div class="field"><label for="gMonthly">Aporte mensal</label><div class="input-money"><input class="input" id="gMonthly" type="number" min="0" step="10" value="${x.monthly}"></div></div>
@@ -1404,7 +1418,7 @@
       const prev = () => { const r = simulate(+$('#gTarget', m).value || 0, +$('#gSaved', m).value || 0, +$('#gMonthly', m).value || 0, +$('#gRate', m).value || 0); $('#gPrev', m).innerHTML = (+$('#gTarget', m).value) ? (r.months === Infinity ? 'Defina um aporte mensal para ver a previsão.' : `📅 Previsão: <b>${monthsTxt(r.months)}</b> (${monthYear(addMonths(r.months))})${r.interest > 1 ? `, com <b>${brlRaw(r.interest, 0)}</b> de rendimento` : ''}.`) : 'Preencha o valor da meta para ver a previsão.'; };
       $$('input', m).forEach((i) => i.addEventListener('input', prev)); prev();
       $('#gEm', m).addEventListener('click', (e) => { const b = e.target.closest('[data-em]'); if (!b) return; em = b.dataset.em; $$('#gEm button', m).forEach((z) => z.classList.toggle('on', z === b)); });
-      $('#gCol', m).addEventListener('click', (e) => { const b = e.target.closest('[data-col]'); if (!b) return; col = b.dataset.col; $$('#gCol button', m).forEach((z) => { z.style.boxShadow = z === b ? '0 0 0 3px #F7F6F0,0 0 0 5px #161616' : ''; }); });
+      $('#gCol', m).addEventListener('click', (e) => { const b = e.target.closest('[data-col]'); if (!b) return; col = b.dataset.col; $$('#gCol button', m).forEach((z) => { z.style.boxShadow = z === b ? '0 0 0 3px #F3F5F4,0 0 0 5px #0B3D33' : ''; }); });
       m.addEventListener('click', (e) => {
         const a = e.target.closest('[data-act-m]'); if (!a) return;
         if (a.dataset.actM === 'del') { if (confirm(`Excluir a caixinha “${g.name}”? O saldo de ${brlRaw(g.saved)} volta para a conta.`)) { if (g.saved > 0) S.tx.push({ id: uid(), ts: Date.now(), date: todayStr(), desc: `Resgate · ${g.name}`, amount: g.saved, cat: 'caixinha', method: 'ted', accountId: g.accountId || S.accounts[0].id, goalId: g.id, source: 'manual' }); S.goals = S.goals.filter((z) => z !== g); closeModal(); commit(); } return; }
@@ -1563,7 +1577,7 @@
     };
     const done = (b, n, counts) => {
       step = 3;
-      box.innerHTML = `${steps()}<div style="text-align:center"><img src="${MASCOT}" alt="" style="width:80px;margin:0 auto 10px;animation:float 3s ease-in-out infinite"><h3 class="display" style="font-size:1.6rem">${esc(b.name)} conectado!</h3><p class="muted" style="margin-top:6px">Importamos <b>${n} transações</b>, 1 conta e 1 cartão. Já categorizamos tudo:</p></div>
+      box.innerHTML = `${steps()}<div style="text-align:center"><img src="${MASCOT}" alt="" style="width:80px;margin:0 auto 10px"><h3 class="display" style="font-size:1.6rem">${esc(b.name)} conectado!</h3><p class="muted" style="margin-top:6px">Importamos <b>${n} transações</b>, 1 conta e 1 cartão. Já categorizamos tudo:</p></div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:16px">${Object.entries(counts).map(([c, k]) => `<span class="chip">${catIco(c)} ${cat(c).name} · ${k}</span>`).join('')}</div>
         <div class="modal-foot" style="justify-content:center"><button class="btn btn-sm" data-close>Fechar</button><button class="btn btn-lime" data-of="see">Ver transações ${ARROW}</button></div>`;
       render();
@@ -1622,6 +1636,7 @@
       const widget = new window.PluggyConnect({
         connectToken: data.accessToken,
         includeSandbox: !!API.cfg.sandbox,
+        products: ['ACCOUNTS', 'CREDIT_CARDS', 'TRANSACTIONS', 'INVESTMENTS'],
         language: 'pt',
         onSuccess: async ({ item }) => {
           toast('Banco autorizado! Importando suas transações…', '⏳', 4000);
@@ -1646,7 +1661,7 @@
     root.className = 'auth';
     root.innerHTML = `
       <section class="auth-art">
-        <a href="index.html" class="brand" aria-label="Finaxis — página inicial"><img src="${MASCOT}" alt=""><span class="brand-word" style="color:#fff">FIN<em style="color:#C8FF2E">AXIS</em></span></a>
+        <a href="index.html" class="brand" aria-label="Finaxis — página inicial"><img src="${MASCOT}" alt=""><span class="brand-word" style="color:#fff">Finaxis</span></a>
         <div>
           <h1 class="display">Seu dinheiro sob <span class="serif">controle</span>, em tempo real</h1>
           <ul><li>Bancos e cartões conectados via Open Finance</li><li>Gastos categorizados sozinhos</li><li>Caixinhas com simulação de metas</li></ul>
@@ -1656,6 +1671,8 @@
       <section class="auth-panel">
         <div class="card auth-card">
           <div class="seg" id="authTabs" style="margin-bottom:20px"><button type="button" data-m="login" class="on">Entrar</button><button type="button" data-m="signup">Criar conta</button></div>
+          <button class="btn auth-google" id="authGoogle" type="button"><svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#4285F4" d="M43.6 24.5c0-1.4-.1-2.8-.4-4.1H24v7.8h11a9.4 9.4 0 0 1-4.1 6.2v5.1h6.7c3.9-3.6 6-8.8 6-15Z"/><path fill="#34A853" d="M24 44c5.5 0 10.2-1.8 13.6-4.9l-6.7-5.1c-1.8 1.2-4.1 1.9-6.9 1.9-5.3 0-9.8-3.6-11.4-8.4H5.7v5.3A20 20 0 0 0 24 44Z"/><path fill="#FBBC05" d="M12.6 27.5a12 12 0 0 1 0-7v-5.3H5.7a20 20 0 0 0 0 17.6l6.9-5.3Z"/><path fill="#EA4335" d="M24 12.1c3 0 5.7 1 7.8 3.1l5.9-5.9C34.2 6 29.5 4 24 4A20 20 0 0 0 5.7 15.2l6.9 5.3c1.6-4.8 6.1-8.4 11.4-8.4Z"/></svg>Continuar com Google</button>
+          <div class="auth-divider"><span>ou entre com e-mail</span></div>
           <form id="authForm" class="stack" style="gap:14px" novalidate>
             <div class="field" id="fName" hidden><label for="aName2">Seu nome</label><input class="input" id="aName2" autocomplete="name" maxlength="60"></div>
             <div class="field"><label for="aEmail">E-mail</label><input class="input" id="aEmail" type="email" autocomplete="email" required></div>
@@ -1667,6 +1684,9 @@
         </div>
       </section>`;
     document.body.appendChild(root);
+    const googleButton = $('#authGoogle', root);
+    googleButton.addEventListener('click', () => { location.href = '/api/auth/google'; });
+    fetch('/api/auth/providers', { cache: 'no-store' }).then((r) => r.json()).then((p) => { googleButton.hidden = !p.google; }).catch(() => { googleButton.hidden = true; });
     const setMode = (m) => {
       mode = m;
       $$('#authTabs button', root).forEach((b) => b.classList.toggle('on', b.dataset.m === m));
@@ -1825,7 +1845,7 @@
     openLesson: (el) => {
       const course = COURSES.find((c) => c.lessons.some((l) => l.id === el.dataset.id)), l = course.lessons.find((x) => x.id === el.dataset.id);
       const done = S.learn.done.includes(l.id);
-      openModal({ title: l.t, body: `<span class="tag" style="background:${course.color};color:#fff">${course.emoji} ${course.title}</span><div class="lesson-content" style="margin-top:14px">${l.body.map((p) => `<p>${esc(p)}</p>`).join('')}<div class="callout">💡 <b>Na prática:</b> ${esc(l.tip)}</div></div>`, foot: `<button class="btn btn-sm" data-close>Fechar</button>${done ? '<span class="chip" style="background:#C8FF2E">Concluída ✓</span>' : '<button class="btn btn-lime" id="lDone">Concluir aula · +50 XP</button>'}`, onMount: (m) => {
+      openModal({ title: l.t, body: `<span class="tag" style="background:${course.color};color:#fff">${course.emoji} ${course.title}</span><div class="lesson-content" style="margin-top:14px">${l.body.map((p) => `<p>${esc(p)}</p>`).join('')}<div class="callout">💡 <b>Na prática:</b> ${esc(l.tip)}</div></div>`, foot: `<button class="btn btn-sm" data-close>Fechar</button>${done ? '<span class="chip" style="background:#3DBA85">Concluída ✓</span>' : '<button class="btn btn-lime" id="lDone">Concluir aula · +50 XP</button>'}`, onMount: (m) => {
         const b = $('#lDone', m); if (b) b.addEventListener('click', () => { S.learn.done.push(l.id); S.learn.xp += 50; closeModal(); commit(); toast('Aula concluída: <b>+50 XP</b>', '🎓'); });
       } });
     },
@@ -1838,7 +1858,7 @@
   };
 
   function onboarding() {
-    openModal({ title: 'Bem-vindo ao <span class="serif">Finaxis</span>', body: `<div style="display:flex;gap:14px;align-items:center;margin-bottom:18px"><img src="${MASCOT}" alt="" style="width:64px;animation:float 3s ease-in-out infinite"><p style="line-height:1.5">Eu sou o Fini! Me conta três coisas rapidinho e eu monto seu painel.</p></div>
+    openModal({ title: 'Bem-vindo ao <span class="serif">Finaxis</span>', body: `<div style="display:flex;gap:14px;align-items:center;margin-bottom:18px"><img src="${MASCOT}" alt="" style="width:64px"><p style="line-height:1.5">Responda três perguntas rápidas e o Finaxis monta seu painel.</p></div>
       <div class="form-grid"><div class="field full"><label for="oName">Seu nome</label><input class="input" id="oName" placeholder="Como quer ser chamado(a)?"></div>
       <div class="field"><label for="oSal">Salário líquido</label><div class="input-money"><input class="input" id="oSal" type="number" min="0" step="50"></div></div>
       <div class="field"><label for="oDay">Dia em que recebe</label><input class="input" id="oDay" type="number" min="1" max="31" value="5"></div>
@@ -1893,13 +1913,23 @@
 
   async function boot() {
     const shot = new URLSearchParams(location.search).has('shot'); // ?shot = captura de tela limpa
+    const params = new URLSearchParams(location.search);
+    let googleErrorMessage = '';
+    if (params.get('auth') === 'google' || params.has('google_error')) {
+      try { sessionStorage.removeItem('finaxis.local'); } catch (_) { /* ignore */ }
+      if (params.has('google_error')) {
+        const messages = { not_configured: 'Login Google ainda não configurado no servidor.', cancelled: 'Login Google cancelado.', invalid_state: 'A tentativa expirou. Tente entrar com Google novamente.', token_exchange: 'O Google não concluiu a autenticação. Tente novamente.', invalid_identity: 'Não foi possível validar sua conta Google.', authentication_failed: 'Falha no login Google. Tente novamente.' };
+        googleErrorMessage = messages[params.get('google_error')] || 'Não foi possível entrar com Google.';
+        history.replaceState(null, '', location.pathname);
+      } else history.replaceState(null, '', location.pathname);
+    }
     let localChosen = false;
     try { localChosen = sessionStorage.getItem('finaxis.local') === '1'; } catch (_) { /* ignore */ }
     if (!shot && location.protocol.startsWith('http')) {
       try { const r = await fetch('/api/health', { cache: 'no-store' }); API.available = r.ok && !!(await r.json()).ok; } catch (_) { API.available = false; }
     }
     if (API.available && !localChosen) {
-      try { API.user = (await api('GET', '/api/me')).data.user; } catch (e) { if (e.status === 401) return showAuth(); throw e; }
+      try { API.user = (await api('GET', '/api/me')).data.user; } catch (e) { if (e.status === 401) return showAuth(googleErrorMessage); throw e; }
       API.online = true;
       API.cfg = (await api('GET', '/api/openfinance/config')).data;
       await loadRemote();

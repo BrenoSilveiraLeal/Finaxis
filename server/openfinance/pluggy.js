@@ -46,6 +46,15 @@ function createPluggy({ clientId, clientSecret, baseUrl = BASE }) {
     item: (id) => req('GET', `/items/${encodeURIComponent(id)}`),
     deleteItem: (id) => req('DELETE', `/items/${encodeURIComponent(id)}`),
     accounts: async (itemId) => (await req('GET', `/accounts?itemId=${encodeURIComponent(itemId)}`)).results || [],
+    async investments(itemId) {
+      const out = [];
+      for (let page = 1; page <= 20; page++) {
+        const result = await req('GET', `/investments?itemId=${encodeURIComponent(itemId)}&page=${page}&pageSize=500`);
+        out.push(...(result.results || []));
+        if (page >= (result.totalPages || 1)) break;
+      }
+      return out;
+    },
     async transactions(accountId, dateFrom) {
       const out = [];
       let path = `/v2/transactions?accountId=${encodeURIComponent(accountId)}&dateFrom=${dateFrom}`;
@@ -55,13 +64,6 @@ function createPluggy({ clientId, clientSecret, baseUrl = BASE }) {
         path = page.next ? `/v2/transactions${page.next}` : null;
       }
       return out;
-    },
-    /** Garante um webhook "all" apontando para a nossa URL, com cabeçalho secreto (Pluggy não assina webhooks). */
-    async ensureWebhook(url, secret) {
-      const list = (await req('GET', '/webhooks')) || {};
-      const found = (list.results || []).find((w) => w.url === url && !w.disabledAt);
-      if (found) return found;
-      return req('POST', '/webhooks', { url, event: 'all', headers: { 'X-Finaxis-Secret': secret } });
     },
   };
 }

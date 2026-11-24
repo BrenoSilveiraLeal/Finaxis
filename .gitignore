@@ -1,3 +1,23 @@
+# Segredos: nunca versionar
 .env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Banco local e dados
 data/
+*.db
+*.db-shm
+*.db-wal
+
+# Dependências e build
 node_modules/
+public/
+
+# Ferramentas / local
+.vercel
+.impeccable/
+.claude/
+*.log
+.DS_Store

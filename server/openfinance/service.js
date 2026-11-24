@@ -1,7 +1,7 @@
 'use strict';
 const { HttpError, randomId, isoDate, safeEqual } = require('../util');
 const { createPluggy } = require('./pluggy');
-const { bankKey, mapAccounts, mapTx } = require('./mapping');
+const { bankKey, mapAccounts, mapInvestments, mapTx } = require('./mapping');
 
 const DAY = 86400000;
 
@@ -29,10 +29,6 @@ function createOpenFinance({ db, store, events, log = console }) {
   const publicUrl = (env.PUBLIC_URL || '').replace(/\/$/, '');
   const webhookUrl = pluggy && /^https:\/\//.test(publicUrl) && env.WEBHOOK_SECRET ? `${publicUrl}/api/webhooks/pluggy` : null;
 
-  db.exec(`CREATE TABLE IF NOT EXISTS connection_accounts (
-    external_account_id TEXT PRIMARY KEY,
-    connection_id TEXT NOT NULL REFERENCES connections(id) ON DELETE CASCADE)`);
-
   const q = {
     byId: db.prepare('SELECT * FROM connections WHERE id = ?'),
     byExt: db.prepare('SELECT * FROM connections WHERE provider = ? AND external_id = ?'),
@@ -58,28 +54,29 @@ function createOpenFinance({ db, store, events, log = console }) {
   }
 
   /** Grava dados bancários (transações + contas + cartões) de forma atômica e avisa as abas abertas. */
-  function applyBank(conn, accs, cards, txs, status = 'active', error = null) {
+  async function applyBank(conn, accs, cards, txs, investments = [], status = 'active', error = null) {
     const uid = conn.user_id;
     const fresh = [];
-    const version = db.atomic(() => {
+    const version = await db.atomic(async () => {
       for (const t of txs) {
-        if (!t.date || store.isTombstoned(uid, t.id)) continue;
-        const old = store.getTx(uid, t.id);
+        if (!t.date || await store.isTombstoned(uid, t.id)) continue;
+        const old = await store.getTx(uid, t.id);
         const merged = old ? { ...old, ...t, cat: old.cat || t.cat } : t; // categoria escolhida pelo usuário prevalece
         if (!old) fresh.push(merged);
-        store.putTx(uid, merged);
+        await store.putTx(uid, merged);
       }
-      const all = store.listTx(uid);
+      const all = await store.listTx(uid);
       for (const a of accs) {
         const s = all.filter((x) => x.accountId === a.id).reduce((p, x) => p + x.amount, 0);
         a.initial = Math.round((a.balance - s) * 100) / 100; // o app calcula saldo = inicial + transações
       }
-      for (const a of [...accs, ...cards]) q.linkAcc.run(a.id.replace(/^of_/, ''), conn.id);
-      const v = store.mutateDoc(uid, (doc) => {
+      for (const a of [...accs, ...cards]) await q.linkAcc.run(a.id.replace(/^of_/, ''), conn.id);
+      const v = await store.mutateDoc(uid, (doc) => {
         doc.accounts = mergeList(doc.accounts, accs, conn.id);
         doc.cards = mergeList(doc.cards, cards, conn.id);
+        if (investments) doc.investments = mergeList(doc.investments, investments, conn.id);
       });
-      q.setSync.run(Date.now(), status, error, conn.id);
+      await q.setSync.run(Date.now(), status, error, conn.id);
       return v;
     });
     fresh.sort((a, b) => b.date.localeCompare(a.date));
@@ -100,20 +97,25 @@ function createOpenFinance({ db, store, events, log = console }) {
         const item = await pluggy.item(conn.external_id);
         if (item.connector) {
           const name = item.connector.name || conn.bank_name;
-          q.setBank.run(bankKey(name), name, item.connector.primaryColor ? '#' + String(item.connector.primaryColor).replace('#', '') : conn.bank_color, conn.id);
-          conn = q.byId.get(conn.id);
+          await q.setBank.run(bankKey(name), name, item.connector.primaryColor ? '#' + String(item.connector.primaryColor).replace('#', '') : conn.bank_color, conn.id);
+          conn = await q.byId.get(conn.id);
         }
         const accounts = await pluggy.accounts(conn.external_id);
         const from = isoDate(conn.last_sync_at ? conn.last_sync_at - 10 * DAY : Date.now() - 365 * DAY);
         const txs = [];
         for (const a of accounts) for (const t of await pluggy.transactions(a.id, from)) txs.push(mapTx(t, a, conn));
         const { accs, cards } = mapAccounts(conn, accounts);
+        let investments = [];
+        if (Array.isArray(item.products) && item.products.includes('INVESTMENTS')) {
+          try { investments = mapInvestments(conn, await pluggy.investments(conn.external_id)); }
+          catch (e) { log.warn('[investments]', conn.id, e.message); investments = null; }
+        }
         const bad = ['LOGIN_ERROR', 'OUTDATED'].includes(item.status);
         const status = item.status === 'UPDATING' ? 'updating' : bad ? 'error' : 'active';
-        return applyBank(conn, accs, cards, txs, status, bad ? (item.error && item.error.message) || item.executionStatus || item.status : null);
+        return applyBank(conn, accs, cards, txs, investments, status, bad ? (item.error && item.error.message) || item.executionStatus || item.status : null);
       } catch (e) {
         log.error('[sync]', conn.id, e.message);
-        q.setStatus.run(e.status === 404 ? 'revoked' : 'error', e.message.slice(0, 300), conn.id);
+        await q.setStatus.run(e.status === 404 ? 'revoked' : 'error', e.message.slice(0, 300), conn.id);
         throw e;
       } finally {
         inflight.delete(conn.id);
@@ -125,7 +127,10 @@ function createOpenFinance({ db, store, events, log = console }) {
 
   async function connectToken(user) {
     if (!pluggy) throw new HttpError(400, 'Pluggy não configurado');
-    return pluggy.connectToken(user.id, webhookUrl || undefined);
+    // Per-token webhooks work without the team's optional Webhooks API permission.
+    // Pluggy does not send custom headers for webhookUrl, so use the random URL token.
+    const callback = webhookUrl ? `${webhookUrl}?secret=${encodeURIComponent(env.WEBHOOK_SECRET)}` : undefined;
+    return pluggy.connectToken(user.id, callback);
   }
 
   /** Registra o item retornado pelo widget. Só aceita itens criados com o clientUserId deste usuário. */
@@ -134,26 +139,28 @@ function createOpenFinance({ db, store, events, log = console }) {
     if (typeof itemId !== 'string' || !/^[\w-]{8,80}$/.test(itemId)) throw new HttpError(400, 'itemId inválido');
     const item = await pluggy.item(itemId).catch((e) => { throw new HttpError(e.status === 404 ? 404 : 502, 'Não foi possível consultar a conexão no Pluggy'); });
     if (item.clientUserId !== user.id) throw new HttpError(403, 'Esta conexão não pertence à sua conta');
-    let conn = q.byExt.get('pluggy', itemId);
+    let conn = await q.byExt.get('pluggy', itemId);
     if (conn && conn.user_id !== user.id) throw new HttpError(403, 'Esta conexão não pertence à sua conta');
     if (!conn) {
       const name = (item.connector && item.connector.name) || 'Banco';
       const color = item.connector && item.connector.primaryColor ? '#' + String(item.connector.primaryColor).replace('#', '') : '#161616';
-      q.ins.run('c_' + randomId(10), user.id, 'pluggy', itemId, bankKey(name), name, color, 'active', Date.now());
-      conn = q.byExt.get('pluggy', itemId);
-    } else q.setStatus.run('active', null, conn.id);
+      await q.ins.run('c_' + randomId(10), user.id, 'pluggy', itemId, bankKey(name), name, color, 'active', Date.now());
+      conn = await q.byExt.get('pluggy', itemId);
+    } else await q.setStatus.run('active', null, conn.id);
     // A coleta pode ainda estar em andamento: sincroniza agora e de novo em alguns instantes
-    const first = await Promise.race([syncConnection(conn).catch(() => null), new Promise((r) => setTimeout(r, 20000))]);
-    for (const ms of [15000, 60000, 180000]) setTimeout(() => syncConnection(q.byId.get(conn.id)).catch(() => {}), ms).unref();
-    return { connection: publicConn(q.byId.get(conn.id)), imported: first ? first.imported : 0 };
+    const sync = syncConnection(conn).catch(() => null);
+    if (process.env.VERCEL) require('@vercel/functions').waitUntil(sync);
+    const first = await Promise.race([sync, new Promise((r) => setTimeout(r, 20000))]);
+    for (const ms of [15000, 60000, 180000]) setTimeout(async () => syncConnection(await q.byId.get(conn.id)).catch(() => {}), ms).unref();
+    return { connection: publicConn(await q.byId.get(conn.id)), imported: first ? first.imported : 0 };
   }
 
   /* -------------------------------------------------------------- Demo */
-  function demoConnect(user, key) {
+  async function demoConnect(user, key) {
     const [name, color] = DEMO_BANKS[key] || DEMO_BANKS.nubank;
     const id = 'c_' + randomId(10);
-    q.ins.run(id, user.id, 'demo', 'demo_' + randomId(10), key in DEMO_BANKS ? key : 'nubank', name, color, 'active', Date.now());
-    const conn = q.byId.get(id);
+    await q.ins.run(id, user.id, 'demo', 'demo_' + randomId(10), key in DEMO_BANKS ? key : 'nubank', name, color, 'active', Date.now());
+    const conn = await q.byId.get(id);
     const accId = 'dm_' + randomId(8), cardId = 'dm_' + randomId(8);
     const accs = [{ id: accId, bank: conn.bank_key, bankName: name, bankColor: color, name: `Conta ${name}`, kind: 'corrente', balance: rnd(800, 3200), connected: true, provider: 'demo', connectionId: id, lastSync: Date.now() }];
     const limit = 2000 + Math.round(Math.random() * 6) * 500;
@@ -164,15 +171,15 @@ function createOpenFinance({ db, store, events, log = console }) {
       desc, amount: income ? rnd(lo, hi) : -rnd(lo, hi), cat: null, method, source: 'bank', connectionId: id,
       ...(method === 'credito' ? { cardId } : { accountId: accId }),
     }));
-    return { connection: publicConn(conn), ...applyBank(conn, accs, cards, txs) };
+    return { connection: publicConn(conn), ...await applyBank(conn, accs, cards, txs) };
   }
 
   /** Simula o banco enviando uma nova transação (Pix, compra no débito ou no crédito). */
-  function demoTick(userId) {
-    const conns = q.byUser.all(userId).filter((c) => c.provider === 'demo');
+  async function demoTick(userId) {
+    const conns = (await q.byUser.all(userId)).filter((c) => c.provider === 'demo');
     if (!conns.length) return null;
     const conn = conns[Math.floor(Math.random() * conns.length)];
-    const { doc } = store.readDoc(userId);
+    const { doc } = await store.readDoc(userId);
     const accs = ((doc && doc.accounts) || []).filter((a) => a.connectionId === conn.id).map((a) => ({ ...a }));
     const cards = ((doc && doc.cards) || []).filter((c) => c.connectionId === conn.id).map((c) => ({ ...c }));
     if (!accs.length) return null;
@@ -187,43 +194,46 @@ function createOpenFinance({ db, store, events, log = console }) {
 
   /* --------------------------------------------------------- Comuns */
   async function disconnect(user, connId) {
-    const conn = q.byId.get(connId);
+    const conn = await q.byId.get(connId);
     if (!conn || conn.user_id !== user.id) throw new HttpError(404, 'Conexão não encontrada');
     if (conn.provider === 'pluggy') await pluggy.deleteItem(conn.external_id).catch((e) => { if (e.status !== 404) throw new HttpError(502, 'Não foi possível revogar no Pluggy'); });
-    q.setStatus.run('revoked', null, conn.id);
-    const version = store.mutateDoc(user.id, (doc) => {
+    await q.setStatus.run('revoked', null, conn.id);
+    const version = await store.mutateDoc(user.id, (doc) => {
       const off = (x) => (x.connectionId === conn.id ? { ...x, connected: false, provider: 'manual', connectionId: undefined } : x);
       doc.accounts = (doc.accounts || []).map(off);
       doc.cards = (doc.cards || []).map(off);
+      doc.investments = (doc.investments || []).filter((x) => x.connectionId !== conn.id);
     });
     events.emit(user.id, { type: 'bank-disconnect', version, connectionId: conn.id });
     return { ok: true, version };
   }
 
   async function syncUser(user, connId) {
-    const list = q.byUser.all(user.id).filter((c) => (!connId || c.id === connId) && c.provider === 'pluggy');
+    const list = (await q.byUser.all(user.id)).filter((c) => (!connId || c.id === connId) && c.provider === 'pluggy');
     let imported = 0;
     for (const c of list) imported += (await syncConnection(c).catch(() => ({ imported: 0 }))).imported || 0;
-    return { imported, connections: q.byUser.all(user.id).map(publicConn) };
+    return { imported, connections: (await q.byUser.all(user.id)).map(publicConn) };
   }
 
   /** Webhook do Pluggy: responde rápido, valida o segredo e processa em segundo plano. */
   function webhookAuthorized(req, body) {
-    if (!env.WEBHOOK_SECRET || !safeEqual(req.headers['x-finaxis-secret'] || '', env.WEBHOOK_SECRET)) return false;
-    if (body && body.clientId && env.PLUGGY_CLIENT_ID && body.clientId !== env.PLUGGY_CLIENT_ID) return false;
+    const querySecret = new URL(req.url, `http://${req.headers.host || 'localhost'}`).searchParams.get('secret') || '';
+    const supplied = req.headers['x-finaxis-secret'] || querySecret;
+    if (!env.WEBHOOK_SECRET || !safeEqual(supplied, env.WEBHOOK_SECRET)) return false;
+    if (env.PLUGGY_CLIENT_ID && (!body || body.clientId !== env.PLUGGY_CLIENT_ID)) return false;
     return true;
   }
 
   async function handleWebhook(body) {
     if (!pluggy || !body || typeof body.event !== 'string') return;
-    if (body.eventId && q.seenEvent.run(String(body.eventId), Date.now()).changes === 0) return; // repetido
-    const conn = body.itemId ? q.byExt.get('pluggy', String(body.itemId)) : body.accountId ? q.byAccount.get(String(body.accountId)) : null;
+    if (body.eventId && (await q.seenEvent.run(String(body.eventId), Date.now())).changes === 0) return; // repetido
+    const conn = body.itemId ? await q.byExt.get('pluggy', String(body.itemId)) : body.accountId ? await q.byAccount.get(String(body.accountId)) : null;
     if (!conn) return;
     const ev = body.event;
-    if (ev === 'item/deleted') { q.setStatus.run('revoked', null, conn.id); return; }
-    if (ev === 'item/error') { q.setStatus.run('error', (body.error && body.error.message) || 'Erro na conexão', conn.id); events.emit(conn.user_id, { type: 'bank-error', connectionId: conn.id }); return; }
+    if (ev === 'item/deleted') { await q.setStatus.run('revoked', null, conn.id); return; }
+    if (ev === 'item/error') { await q.setStatus.run('error', (body.error && body.error.message) || 'Erro na conexão', conn.id); events.emit(conn.user_id, { type: 'bank-error', connectionId: conn.id }); return; }
     if (ev === 'transactions/deleted' && Array.isArray(body.transactionIds)) {
-      const version = db.atomic(() => { body.transactionIds.forEach((id) => store.delTx(conn.user_id, 'of_' + id)); return store.readDoc(conn.user_id).version; });
+      const version = await db.atomic(async () => { for (const id of body.transactionIds) await store.delTx(conn.user_id, 'of_' + id); return (await store.readDoc(conn.user_id)).version; });
       events.emit(conn.user_id, { type: 'bank-sync', version, connectionId: conn.id, count: 0 });
       return;
     }
@@ -232,28 +242,25 @@ function createOpenFinance({ db, store, events, log = console }) {
 
   /* --------------------------------------------------- Rotinas de fundo */
   function start() {
-    if (pluggy && webhookUrl) {
-      pluggy.ensureWebhook(webhookUrl, env.WEBHOOK_SECRET).then(() => log.info('[pluggy] webhook ativo em', webhookUrl)).catch((e) => log.error('[pluggy] webhook:', e.message));
-    }
     // Varredura periódica (cobre quem não tem webhook público, ex.: rodando local)
     const every = Math.max(5, Number(env.SYNC_INTERVAL_MINUTES) || 60) * 60000;
     setInterval(async () => {
       if (!pluggy) return;
-      for (const c of q.stale.all(Date.now() - every)) await syncConnection(c).catch(() => {});
-      q.purgeEvents.run(Date.now() - 7 * DAY);
+      for (const c of await q.stale.all(Date.now() - every)) await syncConnection(c).catch(() => {});
+      await q.purgeEvents.run(Date.now() - 7 * DAY);
     }, 5 * 60000).unref();
     // Ao abrir o app, sincroniza conexões paradas há mais de 10 min
     events.onSubscribe((uid) => {
       if (!pluggy) return;
-      for (const c of q.byUser.all(uid)) if (c.provider === 'pluggy' && (!c.last_sync_at || Date.now() - c.last_sync_at > 10 * 60000)) syncConnection(c).catch(() => {});
+      Promise.resolve(q.byUser.all(uid)).then((rows) => { for (const c of rows) if (c.provider === 'pluggy' && (!c.last_sync_at || Date.now() - c.last_sync_at > 10 * 60000)) syncConnection(c).catch(() => {}); });
     });
     // Demo "ao vivo": o banco fictício manda uma transação de tempos em tempos para quem está com o app aberto
     const demoEvery = Math.max(15, Number(env.DEMO_LIVE_SECONDS) || 60) * 1000;
-    setInterval(() => {
+    if (!process.env.VERCEL) setInterval(async () => {
       for (const uid of events.onlineUsers()) {
-        const { doc } = store.readDoc(uid);
+        const { doc } = await store.readDoc(uid);
         if (doc && doc.settings && doc.settings.live === false) continue;
-        try { demoTick(uid); } catch (e) { log.error('[demo]', e.message); }
+        try { await demoTick(uid); } catch (e) { log.error('[demo]', e.message); }
       }
     }, demoEvery).unref();
   }
@@ -261,8 +268,9 @@ function createOpenFinance({ db, store, events, log = console }) {
   return {
     provider,
     config: () => ({ provider, sandbox: env.PLUGGY_SANDBOX !== 'false', connectScript: env.PLUGGY_CONNECT_SCRIPT || 'https://cdn.pluggy.ai/pluggy-connect/v2.7.0/pluggy-connect.js', webhooks: !!webhookUrl }),
-    list: (user) => q.byUser.all(user.id).map(publicConn),
-    connectToken, registerItem, demoConnect, demoTick, disconnect, syncUser, webhookAuthorized, handleWebhook, start,
+    list: async (user) => (await q.byUser.all(user.id)).map(publicConn),
+    connectToken, registerItem, demoConnect, demoTick, disconnect, syncUser, webhookAuthorized, handleWebhook,
+    start,
   };
 }
 

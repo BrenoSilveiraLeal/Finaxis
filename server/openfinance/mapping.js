@@ -41,6 +41,30 @@ function mapAccounts(conn, accounts) {
   return { accs, cards };
 }
 
+function mapInvestments(conn, investments) {
+  return investments.filter((x) => x.status !== 'TOTAL_WITHDRAWAL').map((x) => ({
+    id: 'of_' + x.id,
+    name: String(x.name || x.subtype || 'Investimento').slice(0, 160),
+    issuer: x.issuer || conn.bank_name,
+    type: x.type || 'OTHER',
+    subtype: x.subtype || null,
+    currencyCode: x.currencyCode || null,
+    balance: Number(x.balance ?? x.amountWithdrawal ?? x.amount) || 0,
+    originalAmount: Number(x.amountOriginal) || 0,
+    availableToWithdraw: x.amountWithdrawal == null ? null : Number(x.amountWithdrawal),
+    rate: x.rate == null ? null : Number(x.rate),
+    rateType: x.rateType || null,
+    date: x.date ? String(x.date).slice(0, 10) : null,
+    dueDate: x.dueDate ? String(x.dueDate).slice(0, 10) : null,
+    status: x.status || 'ACTIVE',
+    bank: conn.bank_key || 'other',
+    bankName: conn.bank_name,
+    bankColor: conn.bank_color,
+    connectionId: conn.id,
+    provider: 'pluggy',
+  }));
+}
+
 function methodFor(t, isCard) {
   if (isCard) return 'credito';
   const pm = String((t.paymentData && t.paymentData.paymentMethod) || '').toUpperCase();
@@ -60,11 +84,13 @@ function mapTx(t, account, conn) {
   const isCard = account.type === 'CREDIT';
   const desc = String(t.description || t.descriptionRaw || 'Transação').slice(0, 200);
   const abs = Math.abs(Number(t.amount) || 0);
+  const operation = String(t.operationType || '').toUpperCase();
   let amount, cat = null;
   if (isCard) {
-    const credit = PAYMENT_RE.test(desc) || /credit card payment/i.test(t.category || '') || REFUND_RE.test(desc);
+    const cardPayment = PAYMENT_RE.test(desc) || /credit card payment/i.test(t.category || '') || ['PAGAMENTO', 'PAGAMENTO_FATURA'].includes(operation);
+    const credit = t.type === 'CREDIT' || cardPayment || REFUND_RE.test(desc) || operation === 'ESTORNO' || operation === 'CASHBACK';
     amount = credit ? abs : -abs;
-    if (PAYMENT_RE.test(desc) || /credit card payment/i.test(t.category || '')) cat = 'fatura';
+    if (cardPayment) cat = 'fatura';
   } else {
     amount = t.type === 'CREDIT' ? abs : t.type === 'DEBIT' ? -abs : Number(t.amount) || 0;
     if (amount < 0 && (PAYMENT_RE.test(desc) || /credit card payment/i.test(t.category || ''))) cat = 'fatura';
@@ -86,4 +112,4 @@ function mapTx(t, account, conn) {
   };
 }
 
-module.exports = { bankKey, mapAccounts, mapTx };
+module.exports = { bankKey, mapAccounts, mapInvestments, mapTx };

@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Finaxis mascot "Fini": a scalloped red coin with a face -->
+  <g stroke="#161616" stroke-width="2" fill="#F8330B">
+    <circle cx="32" cy="6.5" r="6"/><circle cx="41.8" cy="8.4" r="6"/><circle cx="50" cy="14" r="6"/><circle cx="55.6" cy="22.2" r="6"/>
+    <circle cx="57.5" cy="32" r="6"/><circle cx="55.6" cy="41.8" r="6"/><circle cx="50" cy="50" r="6"/><circle cx="41.8" cy="55.6" r="6"/>
+    <circle cx="32" cy="57.5" r="6"/><circle cx="22.2" cy="55.6" r="6"/><circle cx="14" cy="50" r="6"/><circle cx="8.4" cy="41.8" r="6"/>
+    <circle cx="6.5" cy="32" r="6"/><circle cx="8.4" cy="22.2" r="6"/><circle cx="14" cy="14" r="6"/><circle cx="22.2" cy="8.4" r="6"/>
+  </g>
+  <circle cx="32" cy="32" r="26" fill="#F8330B"/>
+  <circle cx="32" cy="32" r="19" fill="none" stroke="#580D14" stroke-width="2.2" stroke-dasharray="3 3"/>
+  <!-- eyes -->
+  <ellipse cx="24.5" cy="28" rx="5.2" ry="6" fill="#fff" stroke="#161616" stroke-width="2"/>
+  <ellipse cx="39.5" cy="28" rx="5.2" ry="6" fill="#fff" stroke="#161616" stroke-width="2"/>
+  <circle cx="26" cy="29" r="2.4" fill="#161616"/>
+  <circle cx="41" cy="29" r="2.4" fill="#161616"/>
+  <!-- brows -->
+  <path d="M18.5 19.5l9 2.4M45.5 19.5l-9 2.4" stroke="#161616" stroke-width="2.6" stroke-linecap="round"/>
+  <!-- smile -->
+  <path d="M24 39c4.5 5 11.5 5 16 0" fill="#580D14" stroke="#161616" stroke-width="2.2" stroke-linecap="round"/>
+  <!-- lime spark -->
+  <path d="M51 6l1.6 3.8L56.5 11l-3.9 1.4L51 16l-1.6-3.6L45.5 11l3.9-1.2z" fill="#C8FF2E" stroke="#161616" stroke-width="1.4" stroke-linejoin="round"/>
+</svg>

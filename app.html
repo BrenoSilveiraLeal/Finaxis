@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Finaxis | Painel financeiro</title>
+  <meta name="description" content="Painel Finaxis: saldo, transações categorizadas, cartões, caixinhas, orçamentos, contas fixas e dicas financeiras.">
+  <meta name="theme-color" content="#F7F6F0">
+  <link rel="icon" href="assets/img/mascot.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@1&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/finaxis.css">
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar" aria-label="Menu">
+      <a href="index.html" class="brand" aria-label="Finaxis — página inicial">
+        <img src="assets/img/mascot.svg" alt="">
+        <span class="brand-word">FIN<em>AXIS</em></span>
+      </a>
+      <nav class="side-nav" id="sideNav"></nav>
+      <div class="side-promo">
+        <b>Modo demo</b>
+        <p>Os dados são fictícios e ficam só neste navegador. Em Ajustes você pode zerar tudo e começar do seu jeito.</p>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="mobile-top">
+        <a href="index.html" class="brand" aria-label="Finaxis — página inicial"><img src="assets/img/mascot.svg" alt=""><span class="brand-word">FIN<em>AXIS</em></span></a>
+        <button class="icon-btn" id="moreBtn" aria-label="Mais seções">☰</button>
+      </div>
+      <div class="topbar">
+        <div>
+          <p class="hello" id="hello"></p>
+          <h1 class="display" id="viewTitle">Painel</h1>
+        </div>
+        <div class="top-actions">
+          <span class="sync-dot" id="syncDot"><i></i><span>Sincronizado</span></span>
+          <div class="month-switch" id="monthSwitch">
+            <button aria-label="Mês anterior" data-m="-1">‹</button>
+            <span id="monthLabel"></span>
+            <button aria-label="Próximo mês" data-m="1">›</button>
+          </div>
+          <button class="btn btn-lime btn-sm" id="addBtn">+ Lançamento</button>
+        </div>
+      </div>
+      <div id="view"></div>
+    </main>
+  </div>
+
+  <nav class="bottom-nav" id="bottomNav" aria-label="Navegação"></nav>
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+  <div id="modalRoot"></div>
+
+  <script src="assets/js/app.js"></script>
+</body>
+</html>

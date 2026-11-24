@@ -267,7 +267,9 @@ function createOpenFinance({ db, store, events, log = console }) {
 
   return {
     provider,
-    config: () => ({ provider, sandbox: env.PLUGGY_SANDBOX !== 'false', connectScript: env.PLUGGY_CONNECT_SCRIPT || 'https://cdn.pluggy.ai/pluggy-connect/v2.7.0/pluggy-connect.js', webhooks: !!webhookUrl }),
+    // Sandbox connectors are for development only; never expose them in production,
+    // even if PLUGGY_SANDBOX was accidentally enabled in the Vercel environment.
+    config: () => ({ provider, sandbox: env.VERCEL_ENV !== 'production' && env.PLUGGY_SANDBOX === 'true', connectScript: env.PLUGGY_CONNECT_SCRIPT || 'https://cdn.pluggy.ai/pluggy-connect/v2.7.0/pluggy-connect.js', webhooks: !!webhookUrl }),
     list: async (user) => (await q.byUser.all(user.id)).map(publicConn),
     connectToken, registerItem, demoConnect, demoTick, disconnect, syncUser, webhookAuthorized, handleWebhook,
     start,

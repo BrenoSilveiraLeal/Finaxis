@@ -1403,7 +1403,7 @@
   function cardModal(c) {
     const isNew = !c;
     const x = c || { name: '', bank: 'nubank', brand: 'Mastercard', last4: '', limit: 3000, dueDay: 10, accountId: S.accounts[0].id };
-    const body = `<div class="form-grid">
+    const body = `<p class="muted" style="font-size:.85rem;line-height:1.5;margin-bottom:14px">Cadastro manual serve apenas para organizar o cartão. Para importar faturas e compras automaticamente, conecte o banco pelo Open Finance. Nunca informe o número completo do cartão.</p><div class="form-grid">
       <div class="field full"><label for="cName">Nome do cartão</label><input class="input" id="cName" value="${esc(x.name)}" placeholder="Ex.: Nubank Roxinho"></div>
       <div class="field"><label for="cBank">Banco</label><select class="select" id="cBank">${Object.entries(BANKS).filter(([k]) => k !== 'cash').map(([k, b]) => `<option value="${k}" ${x.bank === k ? 'selected' : ''}>${b.name}</option>`).join('')}</select></div>
       <div class="field"><label for="cBrand">Bandeira</label><select class="select" id="cBrand">${['Mastercard', 'Visa', 'Elo', 'Amex', 'Hipercard'].map((b) => `<option ${x.brand === b ? 'selected' : ''}>${b}</option>`).join('')}</select></div>

@@ -166,6 +166,7 @@
   const bankOf = (o) => (o && BANKS[o.bank] && o.bank !== 'other' ? BANKS[o.bank]
     : o && o.bankName ? { name: o.bankName, color: o.bankColor || '#0B3D33', short: o.bankName.replace(/[^A-Za-zÀ-ú0-9]/g, '').slice(0, 2).toLowerCase() }
     : BANKS.cash);
+  const hasBank = () => S.accounts.some((a) => a.connected) || S.cards.some((c) => c.connected);
   const isBankId = (id) => /^(of|dm)_/.test(String(id));
 
   /* ---------------------------------------------------------------- state */
@@ -305,8 +306,9 @@
 
   function setSyncStatus(st) {
     const sd = $('#syncDot'); if (!sd) return;
-    sd.classList.toggle('off', st === 'error' || (!S.settings.live && st !== 'saving'));
-    sd.lastElementChild.textContent = st === 'saving' ? 'Salvando…' : st === 'error' ? 'Sem conexão' : S.settings.live ? 'Ao vivo' : 'Sincronizado';
+    const live = S.settings.live && hasBank();
+    sd.classList.toggle('off', st === 'error');
+    sd.lastElementChild.textContent = st === 'saving' ? 'Salvando…' : st === 'error' ? 'Sem conexão' : live ? 'Ao vivo' : 'Salvo';
   }
 
   function connectEvents() {
@@ -659,7 +661,7 @@
           <button class="btn btn-lime btn-sm" data-act="goalMove" data-id="${g.id}" data-dir="1">+ Guardar</button>
           <button class="btn btn-sm" data-act="goalMove" data-id="${g.id}" data-dir="-1">Resgatar</button>
           <button class="btn btn-sm btn-ghost" data-act="simGoal" data-id="${g.id}">Simular</button>
-          <button class="btn btn-sm btn-ghost" data-act="editGoal" data-id="${g.id}" aria-label="Editar"></button>
+          <button class="btn btn-sm btn-ghost" data-act="editGoal" data-id="${g.id}">Editar</button>
         </div>
       </div></article>`;
   }
@@ -687,11 +689,41 @@
     cap: '<path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11.5V16c3 2.2 9 2.2 12 0v-4.5"/>',
     sliders: '<path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/>',
     menu: '<path d="M4 7h16M4 12h16M4 17h16"/>',
+    minus: '<circle cx="12" cy="12" r="9"/><path d="M8 12h8"/>',
+    plus: '<circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/>',
+    card: '<rect x="2.5" y="5" width="19" height="14" rx="2"/><path d="M2.5 10h19M6 15h4"/>',
+    repeat: '<path d="M17 2l3 3-3 3"/><path d="M4 11V9a4 4 0 0 1 4-4h12M7 22l-3-3 3-3"/><path d="M20 13v2a4 4 0 0 1-4 4H4"/>',
+    check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
   };
   const icon = (k) => `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[k]}</svg>`;
   const TITLES = { painel: 'Seu <span class="serif">painel</span>', transacoes: 'Transações', contas: 'Contas & cartões', orcamentos: 'Orçamentos', caixinhas: 'Suas <span class="serif">caixinhas</span>', calendario: 'Contas fixas', relatorios: 'Relatórios', aprender: 'Dicas & <span class="serif">aprender</span>', ajustes: 'Ajustes' };
 
   const V = {};
+
+  /** Atalhos do painel e lista de primeiros passos (some quando tudo estiver feito ou ao ocultar). */
+  function quickHtml() {
+    const steps = [
+      [S.recurring.some((r) => r.amount > 0), 'Informe quanto você ganha por mês', 'Salário ou renda fixa, lançada sozinha todo mês.', 'qSalary'],
+      [S.cards.length > 0, 'Adicione seu cartão de crédito', 'Escolha o banco e acompanhe a fatura e o limite.', 'newCard'],
+      [S.recurring.some((r) => r.amount < 0), 'Cadastre suas contas fixas', 'Aluguel, internet, academia, assinaturas.', 'newRec'],
+      [S.goals.length > 0, 'Crie um objetivo', 'Viagem, reserva de emergência, um carro: quanto guardar por mês.', 'newGoal'],
+      [S.tx.some((t) => t.amount < 0 && !t.recurringId && !t.goalId), 'Lance um gasto do dia a dia', 'Mercado, Uber, iFood: o que não é fixo.', 'addTx'],
+    ];
+    const done = steps.filter((x) => x[0]).length;
+    const showSteps = done < steps.length && !S.settings.setupDone;
+    return `<div class="quick" role="group" aria-label="Ações rápidas">
+        <button data-act="addTx"><span class="q-ico out">${icon('minus')}</span>Novo gasto</button>
+        <button data-act="qIncome"><span class="q-ico in">${icon('plus')}</span>Nova entrada</button>
+        <button data-act="newCard"><span class="q-ico">${icon('card')}</span>Adicionar cartão</button>
+        <button data-act="newRec"><span class="q-ico">${icon('repeat')}</span>Conta fixa</button>
+        <button data-act="newGoal"><span class="q-ico">${icon('target')}</span>Novo objetivo</button>
+      </div>
+      ${showSteps ? `<section class="card setup">
+        <div class="card-head"><div><h3>Comece por aqui</h3><span class="sub">${done} de ${steps.length} feitos. Com isso o Finaxis já mostra quanto sobra por mês.</span></div><button class="link" data-act="hideSetup">Ocultar</button></div>
+        <div class="setup-bar"><i style="width:${done / steps.length * 100}%"></i></div>
+        <ul class="setup-list">${steps.map(([ok, t, d, act]) => `<li class="${ok ? 'ok' : ''}"><span class="s-dot">${ok ? icon('check') : ''}</span><div><b>${t}</b><span>${d}</span></div>${ok ? '<em>Feito</em>' : `<button class="btn btn-sm" data-act="${act}">Fazer agora</button>`}</li>`).join('')}</ul>
+      </section>` : ''}`;
+  }
 
   V.painel = () => {
     const ym = UI.ym, st = monthStats(ym), pv = monthStats(shiftYm(ym, -1));
@@ -717,6 +749,7 @@
     const tip = tips[0];
 
     return `
+    ${quickHtml()}
     <div class="grid g-main">
       <section class="hero-balance">
         <div>
@@ -841,7 +874,7 @@
         <div class="bc-top"><div style="display:flex;gap:12px;align-items:center"><span class="bank-logo" style="background:${b.color}">${b.short}</span><div><div class="bc-name">${esc(a.name)}</div><span style="font-size:.78rem" class="muted">${a.kind === 'dinheiro' ? 'Dinheiro em espécie' : 'Conta corrente'}</span></div></div>
         ${a.connected ? '<span class="tag tag-live">● Conectada</span>' : '<span class="tag">Manual</span>'}</div>
         <div class="bc-bottom"><div><small>Saldo disponível</small><b>${brl(accBalance(a))}</b></div>
-        <div style="display:flex;gap:6px">${a.connected ? `<button class="btn btn-sm" data-act="syncAcc" data-id="${a.id}">⟳ Sincronizar</button>` : ''}${a.connected && a.connectionId ? `<button class="btn btn-sm btn-ghost" data-act="disconnectAcc" data-id="${a.id}" title="Revogar consentimento">Desconectar</button>` : ''}<button class="btn btn-sm btn-ghost" data-act="editAcc" data-id="${a.id}" aria-label="Editar conta"></button></div></div>
+        <div style="display:flex;gap:6px">${a.connected ? `<button class="btn btn-sm" data-act="syncAcc" data-id="${a.id}">⟳ Sincronizar</button>` : ''}${a.connected && a.connectionId ? `<button class="btn btn-sm btn-ghost" data-act="disconnectAcc" data-id="${a.id}" title="Revogar consentimento">Desconectar</button>` : ''}<button class="btn btn-sm btn-ghost" data-act="editAcc" data-id="${a.id}">Editar</button></div></div>
         ${a.connected ? `<span class="muted" style="font-size:.7rem;position:relative;z-index:1">Última sincronização: ${a.lastSync ? new Date(a.lastSync).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : '—'}</span>` : ''}
       </article>`;
     }).join('');
@@ -862,23 +895,21 @@
           <button class="btn btn-sm btn-ghost" data-act="editCard" data-id="${c.id}">Editar</button>${c.connected && c.connectionId ? `<button class="btn btn-sm btn-ghost" data-act="disconnectAcc" data-id="${c.id}">Desconectar</button>` : ''}
         </div></div>`;
     }).join('');
+    const hasLive = S.accounts.some((x) => x.connected) || S.cards.some((x) => x.connected);
     return `
-    <div class="grid g-main">
-      <section class="card cream" style="display:flex;gap:18px;align-items:center;flex-wrap:wrap">
-        <div style="flex:1;min-width:240px"><h3 class="display" style="font-size:1.6rem">Traga seus bancos e cartões</h3>
-        <p class="muted" style="margin-top:8px;font-size:.9rem;line-height:1.5">Importe o extrato da conta ou a fatura do cartão (OFX ou CSV, baixados no app do banco) e o Finaxis separa Pix, crédito, débito e salário, já categorizados. Prefere anotar à mão? Cadastre a conta ou o cartão e lance seus gastos e ganhos.</p></div>
-        <div style="display:flex;flex-direction:column;gap:10px"><button class="btn btn-lime btn-lg" data-act="importStatement">Importar extrato</button><button class="btn btn-sm" data-act="newAccount">+ Conta</button><button class="btn btn-sm" data-act="newCard">+ Cartão</button>${API.cfg && API.cfg.provider === 'pluggy' ? '<button class="link" data-act="connectBank" style="margin-top:2px">Sincronizar pelo MeuPluggy</button>' : ''}</div>
-      </section>
-      <section class="card">
-        <div class="card-head"><h3>Tempo real</h3><span class="sync-dot ${S.settings.live ? '' : 'off'}"><i></i>${S.settings.live ? 'Ao vivo' : 'Pausado'}</span></div>
-        <div class="setting"><div><b>Receber transações ao vivo</b><span>Novas compras e Pix aparecem assim que o banco envia.</span></div><label class="toggle"><input type="checkbox" data-setting="live" ${S.settings.live ? 'checked' : ''}><span></span></label></div>
-        ${API.cfg && API.cfg.provider === 'demo' ? '<button class="btn btn-red btn-sm" data-act="simulateLive" style="margin-top:12px">Simular nova compra agora</button>' : ''}
-      </section>
-    </div>
-    <h3 class="display" style="font-size:1.4rem;margin:30px 0 14px">Contas</h3>
+    <div class="sec-head"><h3 class="display">Cartões de crédito</h3><button class="btn btn-lime btn-sm" data-act="newCard">+ Adicionar cartão</button></div>
+    ${S.cards.length ? `<div class="grid g-3">${cards}</div>` : `<button class="add-tile" data-act="newCard"><span class="q-ico">${icon('card')}</span><b>Adicione seu primeiro cartão</b><span>Escolha o banco, informe limite e vencimento e acompanhe a fatura.</span></button>`}
+    <div class="sec-head"><h3 class="display">Contas</h3><button class="btn btn-sm" data-act="newAccount">+ Adicionar conta</button></div>
     <div class="grid g-3">${accs}</div>
-    <h3 class="display" style="font-size:1.4rem;margin:30px 0 14px">Cartões de crédito</h3>
-    ${S.cards.length ? `<div class="grid g-3">${cards}</div>` : `<div class="card">${emptyBox('Nenhum cartão cadastrado.', '<button class="btn btn-lime btn-sm" data-act="connectBank">Conectar via Open Finance</button>')}</div>`}`;
+    <section class="card cream import-card">
+      <div><h3>Trazer compras e Pix sem digitar</h3>
+      <p class="muted">Baixe o extrato da conta ou a fatura do cartão no app do seu banco (formato OFX ou CSV) e importe aqui. O Finaxis separa Pix, crédito, débito e salário, já categorizados.</p></div>
+      <div class="import-actions"><button class="btn btn-lime" data-act="importStatement">Importar extrato ou fatura</button>${API.cfg && API.cfg.provider === 'pluggy' ? '<button class="link" data-act="connectBank">Sincronizar pelo MeuPluggy</button>' : ''}</div>
+    </section>
+    ${hasLive ? `<section class="card" style="margin-top:20px">
+      <div class="card-head"><h3>Tempo real</h3><span class="sync-dot ${S.settings.live ? '' : 'off'}"><i></i>${S.settings.live ? 'Ao vivo' : 'Pausado'}</span></div>
+      <div class="setting"><div><b>Receber transações ao vivo</b><span>Novas compras e Pix aparecem assim que o banco envia.</span></div><label class="toggle"><input type="checkbox" data-setting="live" ${S.settings.live ? 'checked' : ''}><span></span></label></div>
+    </section>` : ''}`;
   };
 
   V.orcamentos = () => {
@@ -1006,7 +1037,7 @@
         <div class="cal">${cells}</div>
       </section>
       <div class="stack">
-        <section class="card kpi"><div class="k-label">Comprometido com contas fixas</div><div class="k-value">${brl(fx.out)}<span style="font-size:.5em">/mês</span></div><div class="k-foot">${inc ? `${pct(fx.out / inc)} da sua renda · ideal abaixo de 50%` : 'Informe sua renda em Ajustes'}</div></section>
+        <section class="card kpi"><div class="k-label">Comprometido com contas fixas</div><div class="k-value">${brl(fx.out)}<span style="font-size:.5em">/mês</span></div><div class="k-foot">${inc ? `${pct(fx.out / inc)} da sua renda · ideal abaixo de 50%` : '<button class="link" data-act="qSalary">Informar quanto ganho por mês</button>'}</div></section>
         <section class="card">
           <div class="card-head"><div><h3>Recorrentes</h3><span class="sub">Lançados sozinhos todo mês, no dia certo</span></div><button class="btn btn-sm btn-lime" data-act="newRec">+ Nova</button></div>
           ${list.length ? list.map((r) => `<div class="bill" data-act="editRec" data-id="${r.id}" style="cursor:pointer;${r.active === false ? 'opacity:.45' : ''}"><div class="bill-date"><b>${pad(r.day)}</b><span>dia</span></div><div class="bill-info"><b style="display:flex;gap:6px;align-items:center">${catIco(r.cat)} ${esc(r.desc)}</b><span>${METHODS[r.method] ? METHODS[r.method].name : ''} · ${esc(r.cardId ? (S.cards.find((c) => c.id === r.cardId) || {}).name || '' : (S.accounts.find((a) => a.id === r.accountId) || {}).name || '')}${r.active === false ? ' · pausada' : ''}</span></div><div class="bill-amt ${r.amount > 0 ? 'pos' : ''}">${signed(r.amount)}</div></div>`).join('') : emptyBox('Cadastre aluguel, telefone, streaming… e esqueça.')}
@@ -1155,7 +1186,8 @@
   /* ----------------------------------------------------------- render */
   function render() {
     const r = UI.route;
-    $('#view').innerHTML = `<div class="view">${(V[r] || V.painel)()}</div>`;
+    const entering = UI.shown !== r; UI.shown = r;
+    $('#view').innerHTML = `<div class="view${entering ? ' view-enter' : ''}">${(V[r] || V.painel)()}</div>`;
     $('#viewTitle').innerHTML = TITLES[r] || '';
     const h = now().getHours();
     $('#hello').textContent = `${h < 12 ? 'Bom dia' : h < 18 ? 'Boa tarde' : 'Boa noite'}, ${S.profile.name} `;
@@ -1163,8 +1195,8 @@
     $('#monthSwitch').style.display = ['contas', 'caixinhas', 'aprender', 'ajustes'].includes(r) ? 'none' : '';
     $$('[data-route]').forEach((a) => a.classList.toggle('active', a.dataset.route === r));
     const sd = $('#syncDot');
-    sd.classList.toggle('off', !S.settings.live);
-    sd.lastElementChild.textContent = S.settings.live ? 'Ao vivo' : 'Sincronização pausada';
+    sd.classList.toggle('off', hasBank() && !S.settings.live);
+    sd.lastElementChild.textContent = !hasBank() ? 'Salvo' : S.settings.live ? 'Ao vivo' : 'Sincronização pausada';
     if (r === 'transacoes') renderTxList();
     if (r === 'caixinhas') mountSimulator();
     UI.fresh.clear();
@@ -1193,7 +1225,7 @@
   /* -------------------------------------------------------- modal/toast */
   function openModal({ title, body, wide, foot = '', onMount }) {
     const root = $('#modalRoot');
-    root.innerHTML = `<div class="modal-back" data-close><div class="modal ${wide ? 'wide' : ''}" role="dialog" aria-modal="true" aria-label="${esc(title.replace(/<[^>]+>/g, ''))}"><div class="modal-head"><h3>${title}</h3><button class="icon-btn" data-close aria-label="Fechar"></button></div><div class="modal-body">${body}</div>${foot ? `<div class="modal-foot">${foot}</div>` : ''}</div></div>`;
+    root.innerHTML = `<div class="modal-back" data-close><div class="modal ${wide ? 'wide' : ''}" role="dialog" aria-modal="true" aria-label="${esc(title.replace(/<[^>]+>/g, ''))}"><div class="modal-head"><h3>${title}</h3><button class="icon-btn" data-close aria-label="Fechar"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div><div class="modal-body">${body}</div>${foot ? `<div class="modal-foot">${foot}</div>` : ''}</div></div>`;
     const m = $('.modal', root);
     root.firstElementChild.addEventListener('click', (e) => { if (e.target.hasAttribute('data-close') || e.target.closest('.modal-head [data-close]')) closeModal(); });
     if (onMount) onMount(m);
@@ -1220,12 +1252,12 @@
     return (income ? INC_CATS : EXP_CATS).map((k) => `<button type="button" data-cat="${k}" class="${k === sel ? 'on' : ''}"><span>${catIco(k)}</span>${esc(cat(k).name)}</button>`).join('');
   }
 
-  function txModal(t) {
+  function txModal(t, opts = {}) {
     const isNew = !t;
-    const tx = t || { desc: '', amount: -0, date: todayStr(), method: 'pix', cat: 'outros', accountId: S.accounts[0] && S.accounts[0].id };
-    let income = tx.amount > 0;
-    let picked = !isNew;
-    let curCat = tx.cat;
+    const tx = t || { desc: opts.desc || '', amount: -0, date: todayStr(), method: opts.cardId ? 'credito' : opts.method || 'pix', cat: opts.cat || 'outros', accountId: S.accounts[0] && S.accounts[0].id, cardId: opts.cardId };
+    let income = tx.amount > 0 || !!opts.income;
+    let picked = !isNew || !!opts.cat;
+    let curCat = isNew && opts.income && !opts.cat ? 'outrasentradas' : tx.cat;
     const sys = CATS[tx.cat] && CATS[tx.cat].system;
     const body = `
       <div class="seg red" style="margin-bottom:16px" id="tType"><button type="button" data-v="out" class="${!income ? 'on' : ''}">Despesa</button><button type="button" data-v="in" class="${income ? 'on' : ''}">Receita</button></div>
@@ -1236,11 +1268,12 @@
         <div class="field"><label for="tMethod">Forma</label><select class="select" id="tMethod">${Object.entries(METHODS).map(([k, m]) => `<option value="${k}" ${tx.method === k ? 'selected' : ''}>${m.name}</option>`).join('')}</select></div>
         <div class="field"><label for="tSrc">Conta / cartão</label><select class="select" id="tSrc">${srcOptions(tx.cardId ? 'c:' + tx.cardId : 'a:' + tx.accountId)}</select></div>
         ${isNew ? `<div class="field" id="tInstWrap" style="display:none"><label for="tInst">Parcelas</label><select class="select" id="tInst">${Array.from({ length: 12 }, (_, i) => `<option value="${i + 1}">${i + 1}x</option>`).join('')}</select><span class="hint" id="tInstHint"></span></div>` : ''}
+        ${isNew ? `<label class="field full repeat-row"><input type="checkbox" id="tRepeat" ${opts.repeat ? 'checked' : ''}><span><b>Repetir todo mês</b> neste mesmo dia. Use para salário, aluguel, internet, academia e assinaturas.</span></label>` : ''}
         ${sys ? `<div class="field full"><span class="chip">${catIco(tx.cat)} ${cat(tx.cat).name} (gerado pelo sistema)</span></div>` : `<div class="field full"><label>Categoria</label><div class="cat-pick" id="tCats">${catPicker(curCat, income)}</div></div>`}
         ${!isNew && !sys ? `<label class="field full" style="flex-direction:row;align-items:center;gap:10px;font-size:.85rem"><input type="checkbox" id="tLearn" checked> Usar essa categoria sempre para “${esc(normDesc(tx.desc))}”</label>` : ''}
       </div>`;
     const foot = `${!isNew ? '<button class="btn btn-sm btn-ghost neg" data-act-m="del" style="margin-right:auto">Excluir</button>' : ''}<button class="btn btn-sm" data-close>Cancelar</button><button class="btn btn-lime" data-act-m="save">${isNew ? 'Adicionar' : 'Salvar'}</button>`;
-    openModal({ title: isNew ? 'Novo lançamento' : 'Editar transação', body, foot, onMount: (m) => {
+    openModal({ title: isNew ? (opts.title || 'Novo lançamento') : 'Editar transação', body, foot, onMount: (m) => {
       const setCats = () => { const box = $('#tCats', m); if (box) box.innerHTML = catPicker(curCat, income); };
       const hint = () => {
         const d = $('#tDesc', m).value;
@@ -1271,6 +1304,7 @@
         if (!v) { $('#tAmt', m).focus(); $('#tAmt', m).style.borderColor = '#D4553A'; return; }
         const desc = $('#tDesc', m).value.trim() || cat(curCat).name;
         const [k, id] = $('#tSrc', m).value.split(':');
+        const repeat = !!($('#tRepeat', m) && $('#tRepeat', m).checked);
         const base = { desc, amount: income ? v : -v, date: $('#tDate', m).value || todayStr(), method: $('#tMethod', m).value, cat: sys ? tx.cat : curCat, accountId: k === 'a' ? id : undefined, cardId: k === 'c' ? id : undefined };
         if (isNew) {
           const n = $('#tInst', m) && $('#tInstWrap', m).style.display !== 'none' ? +$('#tInst', m).value : 1;
@@ -1278,9 +1312,14 @@
             const d = parseD(base.date);
             const per = Math.round(base.amount / n * 100) / 100;
             for (let i = 0; i < n; i++) { const di = new Date(d.getFullYear(), d.getMonth() + i, Math.min(d.getDate(), daysIn(d.getFullYear(), d.getMonth() + i))); const amt = i === n - 1 ? Math.round((base.amount - per * (n - 1)) * 100) / 100 : per; const tt = { ...base, id: uid(), ts: Date.now(), source: 'manual', amount: amt, desc: `${desc} (${i + 1}/${n})`, date: ymd(di) }; S.tx.push(tt); UI.fresh.add(tt.id); }
+          } else if (repeat) {
+            const d = parseD(base.date), ym = ymOf(d);
+            const r = { id: uid(), desc, amount: base.amount, cat: base.cat, day: d.getDate(), method: base.method, accountId: base.accountId, cardId: base.cardId, start: ym };
+            S.recurring.push(r); S.posted[r.id + ':' + ym] = 1;
+            const tt = { ...base, id: 'r_' + r.id + '_' + ym, ts: Date.now(), source: 'recurring', recurringId: r.id }; S.tx.push(tt); UI.fresh.add(tt.id);
           } else { const tt = { ...base, id: uid(), ts: Date.now(), source: 'manual' }; S.tx.push(tt); UI.fresh.add(tt.id); }
           if (picked && autoCat(desc, base.amount) !== curCat && !sys) S.learned[normDesc(desc)] = curCat;
-          closeModal(); commit(); toast(`<b>${esc(desc)}</b> lançado em ${cat(base.cat).name}`);
+          closeModal(); commit(); toast(`<b>${esc(desc)}</b> lançado em ${cat(base.cat).name}${repeat ? ` e vai se repetir todo dia ${parseD(base.date).getDate()}` : ''}`);
           budgetCheck(base.cat);
         } else {
           Object.assign(t, base);
@@ -1399,6 +1438,55 @@
     openModal({ title: 'Limites mensais', body, wide: true, foot: `<button class="btn btn-sm" data-close>Cancelar</button><button class="btn btn-lime" id="bOk">Salvar limites</button>`, onMount: (m) => {
       $('#bOk', m).addEventListener('click', () => { const b = {}; $$('[data-b]', m).forEach((i) => { const v = +i.value; if (v > 0) b[i.dataset.b] = v; }); S.budgets = b; closeModal(); commit(); toast('Orçamentos atualizados'); });
     } });
+  }
+
+  /** Adicionar cartão em 3 passos: banco, dados do cartão, como trazer as compras. */
+  function cardWizard() {
+    const m = openModal({ title: 'Adicionar cartão', body: '<div id="cw"></div>', wide: true });
+    const box = $('#cw', m);
+    const bankStep = () => {
+      box.innerHTML = `<p class="cw-q">Qual é o banco do cartão?</p>
+        <div class="bank-pick">${Object.entries(BANKS).filter(([k]) => k !== 'cash').map(([k, b]) => `<button type="button" data-bank="${k}"><span class="bank-logo" style="background:${b.color}">${b.short}</span>${b.name}</button>`).join('')}<button type="button" data-bank="other"><span class="bank-logo" style="background:#5B6B66">+</span>Outro banco</button></div>`;
+      box.querySelectorAll('[data-bank]').forEach((b) => b.addEventListener('click', () => formStep(b.dataset.bank)));
+    };
+    const formStep = (bank) => {
+      const b = BANKS[bank];
+      box.innerHTML = `<button type="button" class="link cw-back" id="cwBack">Trocar de banco</button>
+        <div class="cw-head">${b ? `<span class="bank-logo" style="background:${b.color}">${b.short}</span><b>${b.name}</b>` : '<b>Outro banco</b>'}</div>
+        <div class="form-grid">
+          ${b ? '' : '<div class="field full"><label for="cwBankName">Nome do banco</label><input class="input" id="cwBankName" maxlength="40" placeholder="Ex.: Banco Pan"></div>'}
+          <div class="field full"><label for="cwName">Como quer chamar este cartão</label><input class="input" id="cwName" maxlength="40" value="${b ? `${b.name}` : ''}" placeholder="Ex.: Nubank Roxinho"></div>
+          <div class="field"><label for="cwLast">Últimos 4 dígitos</label><input class="input" id="cwLast" inputmode="numeric" maxlength="4" placeholder="1234"></div>
+          <div class="field"><label for="cwBrand">Bandeira</label><select class="select" id="cwBrand">${['Mastercard', 'Visa', 'Elo', 'Amex', 'Hipercard'].map((x) => `<option>${x}</option>`).join('')}</select></div>
+          <div class="field"><label for="cwLimit">Limite total</label><div class="input-money"><input class="input" id="cwLimit" type="number" min="0" step="100" placeholder="3000"></div></div>
+          <div class="field"><label for="cwDue">Dia do vencimento da fatura</label><input class="input" id="cwDue" type="number" min="1" max="28" value="10"></div>
+          <div class="field full"><label for="cwAcc">Pagar a fatura com</label><select class="select" id="cwAcc">${srcOptions('a:' + ((S.accounts.find((a) => a.bank === bank) || S.accounts[0]).id), true)}</select></div>
+        </div>
+        <p class="cw-safe">O Finaxis nunca pede o número completo, a senha ou o código de segurança do cartão. Os 4 últimos dígitos servem só para você reconhecer qual é.</p>
+        <p class="auth-err" id="cwErr" role="alert"></p>
+        <div class="cw-foot"><button class="btn btn-sm" data-close>Cancelar</button><button class="btn btn-lime" id="cwSave">Adicionar cartão</button></div>`;
+      $('#cwBack', box).addEventListener('click', bankStep);
+      $('#cwName', box).focus();
+      $('#cwSave', box).addEventListener('click', () => {
+        const name = $('#cwName', box).value.trim(), other = $('#cwBankName', box);
+        if (other && !other.value.trim()) { other.focus(); $('#cwErr', box).textContent = 'Informe o nome do banco.'; return; }
+        if (!name) { $('#cwName', box).focus(); $('#cwErr', box).textContent = 'Dê um nome ao cartão.'; return; }
+        const c = { id: uid(), connected: false, name, bank: b ? bank : 'other', ...(b ? {} : { bankName: other.value.trim() }), brand: $('#cwBrand', box).value, last4: $('#cwLast', box).value.replace(/\D/g, '').slice(0, 4), limit: +$('#cwLimit', box).value || 0, dueDay: clamp(+$('#cwDue', box).value || 10, 1, 28), accountId: $('#cwAcc', box).value.split(':')[1] };
+        S.cards.push(c); commit();
+        doneStep(c);
+      });
+    };
+    const doneStep = (c) => {
+      box.innerHTML = `<div class="cw-done"><span class="cw-ok">${icon('check')}</span><h4>${esc(c.name)} adicionado</h4><p>Agora traga as compras do cartão. Escolha o jeito mais fácil para você:</p></div>
+        <div class="cw-opts">
+          <button type="button" id="cwTx"><b>Lançar uma compra</b><span>Anote uma compra no crédito, parcelada ou à vista.</span></button>
+          <button type="button" id="cwImp"><b>Importar a fatura</b><span>Baixe a fatura em OFX ou CSV no app do banco e envie aqui. Todas as compras entram de uma vez.</span></button>
+        </div>
+        <div class="cw-foot"><button class="btn btn-sm" data-close>Concluir</button></div>`;
+      $('#cwTx', box).addEventListener('click', () => txModal(null, { cardId: c.id, title: `Compra no ${c.name}` }));
+      $('#cwImp', box).addEventListener('click', () => importModal());
+    };
+    bankStep();
   }
 
   function cardModal(c) {
@@ -1714,6 +1802,7 @@
 
   /* ----------------------------------------------------- login / conta */
   function showAuth(msg) {
+    hideBoot();
     document.body.classList.add('auth-open');
     let mode = 'login';
     const root = document.createElement('div');
@@ -1866,6 +1955,9 @@
   /* -------------------------------------------------------------- ações */
   const ACTIONS = {
     addTx: () => txModal(),
+    qIncome: () => txModal(null, { income: true, title: 'Nova entrada' }),
+    qSalary: () => txModal(null, { income: true, cat: 'salario', desc: 'Salário', repeat: true, method: 'ted', title: 'Quanto você ganha por mês' }),
+    hideSetup: () => { S.settings.setupDone = true; commit(); },
     editTx: (el) => { const t = S.tx.find((x) => x.id === el.dataset.id); if (t) txModal(t); },
     toggleHide: () => { S.settings.hide = !S.settings.hide; commit(); },
     filterCat: (el) => { UI.f = { q: '', type: 'out', cat: el.dataset.cat, method: '', src: '' }; go('transacoes'); },
@@ -1881,7 +1973,7 @@
     },
     logout: () => logout(),
     deleteAccount: () => deleteAccountModal(),
-    newCard: () => cardModal(), editCard: (el) => cardModal(S.cards.find((c) => c.id === el.dataset.id)),
+    newCard: () => cardWizard(), editCard: (el) => cardModal(S.cards.find((c) => c.id === el.dataset.id)),
     newAccount: () => accountModal(), editAcc: (el) => accountModal(S.accounts.find((a) => a.id === el.dataset.id)),
     viewCard: (el) => { UI.f = { q: '', type: 'all', cat: '', method: '', src: 'c:' + el.dataset.id }; UI.ym = ymOf(now()); go('transacoes'); },
     syncAcc: async (el) => {
@@ -1977,6 +2069,9 @@
     if (API.online) box.innerHTML = `<b>${esc(API.user.name)}</b><p>${esc(API.user.email)}<br>Dados salvos na sua conta${API.cfg && API.cfg.provider === 'demo' ? ' · bancos em modo demonstração' : ''}.</p><button class="link" data-act="logout" style="margin-top:8px">Sair</button>`;
   }
 
+  /** Tira a tela de carregamento com um fade. */
+  function hideBoot() { const b = $('#boot'); if (!b) return; b.classList.add('done'); setTimeout(() => b.remove(), 400); }
+
   async function boot() {
     const params = new URLSearchParams(location.search);
     const createAccountRequested = location.hash === '#criar';
@@ -2006,12 +2101,14 @@
     buildNav();
     sidePanel();
     route();
+    hideBoot();
     reminders();
     connectEvents();
     if (API.isNew) onboarding();
     window.addEventListener('beforeunload', () => { if (API.dirty || API.saving) { clearTimeout(API.timer); pushState(); } });
   }
   boot().catch((e) => {
+    hideBoot();
     console.error(e);
     $('#view').innerHTML = `<div class="card">${emptyBox(`Não foi possível carregar seus dados (${esc(e.message)}). Verifique sua conexão e recarregue a página.`, '<a class="btn btn-lime btn-sm" href="app.html">Recarregar</a>')}</div>`;
   });

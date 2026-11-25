@@ -88,7 +88,7 @@ function mapTx(t, account, conn) {
   let amount, cat = null;
   if (isCard) {
     const cardPayment = PAYMENT_RE.test(desc) || /credit card payment/i.test(t.category || '') || ['PAGAMENTO', 'PAGAMENTO_FATURA'].includes(operation);
-    const credit = t.type === 'CREDIT' || cardPayment || REFUND_RE.test(desc) || operation === 'ESTORNO' || operation === 'CASHBACK';
+    const credit = cardPayment || REFUND_RE.test(desc) || operation === 'ESTORNO' || operation === 'CASHBACK';
     amount = credit ? abs : -abs;
     if (cardPayment) cat = 'fatura';
   } else {

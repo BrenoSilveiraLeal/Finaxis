@@ -783,3 +783,6 @@ body.auth-open .app, body.auth-open .bottom-nav { display: none; }
 .goal-top::before { content: ''; position: absolute; inset: 4px 0 0 0; background: var(--surface); }
 .goal-top > * { position: relative; }
 .goal-top .pct { position: absolute; background: var(--surface-2); color: var(--ink); }
+.cw-opts .cw-rec { border-color: var(--forest); position: relative; }
+.cw-opts .cw-rec .tag { display: inline-block; margin-bottom: 8px; }
+.cw-q + .cw-opts { margin-bottom: 4px; }

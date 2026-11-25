@@ -704,7 +704,7 @@
   function quickHtml() {
     const steps = [
       [S.recurring.some((r) => r.amount > 0), 'Informe quanto você ganha por mês', 'Salário ou renda fixa, lançada sozinha todo mês.', 'qSalary'],
-      [S.cards.length > 0, 'Adicione seu cartão de crédito', 'Escolha o banco e acompanhe a fatura e o limite.', 'newCard'],
+      [S.cards.length > 0, 'Conecte seu cartão de crédito', 'Autorize pelo Open Finance e as compras, a fatura e o limite entram sozinhos.', 'newCard'],
       [S.recurring.some((r) => r.amount < 0), 'Cadastre suas contas fixas', 'Aluguel, internet, academia, assinaturas.', 'newRec'],
       [S.goals.length > 0, 'Crie um objetivo', 'Viagem, reserva de emergência, um carro: quanto guardar por mês.', 'newGoal'],
       [S.tx.some((t) => t.amount < 0 && !t.recurringId && !t.goalId), 'Lance um gasto do dia a dia', 'Mercado, Uber, iFood: o que não é fixo.', 'addTx'],
@@ -898,7 +898,7 @@
     const hasLive = S.accounts.some((x) => x.connected) || S.cards.some((x) => x.connected);
     return `
     <div class="sec-head"><h3 class="display">Cartões de crédito</h3><button class="btn btn-lime btn-sm" data-act="newCard">+ Adicionar cartão</button></div>
-    ${S.cards.length ? `<div class="grid g-3">${cards}</div>` : `<button class="add-tile" data-act="newCard"><span class="q-ico">${icon('card')}</span><b>Adicione seu primeiro cartão</b><span>Escolha o banco, informe limite e vencimento e acompanhe a fatura.</span></button>`}
+    ${S.cards.length ? `<div class="grid g-3">${cards}</div>` : `<button class="add-tile" data-act="newCard"><span class="q-ico">${icon('card')}</span><b>Adicione seu primeiro cartão</b><span>Conecte pelo Open Finance e as compras, a fatura e o limite entram sozinhos. Se preferir, cadastre à mão.</span></button>`}
     <div class="sec-head"><h3 class="display">Contas</h3><button class="btn btn-sm" data-act="newAccount">+ Adicionar conta</button></div>
     <div class="grid g-3">${accs}</div>
     <section class="card cream import-card">
@@ -1440,18 +1440,38 @@
     } });
   }
 
-  /** Adicionar cartão em 3 passos: banco, dados do cartão, como trazer as compras. */
+  /**
+   * Adicionar cartão: banco → conectar pelo Open Finance (puxa compras, fatura, limite e o Pix
+   * da conta automaticamente) ou, como alternativa, cadastrar à mão.
+   */
   function cardWizard() {
     const m = openModal({ title: 'Adicionar cartão', body: '<div id="cw"></div>', wide: true });
     const box = $('#cw', m);
     const bankStep = () => {
       box.innerHTML = `<p class="cw-q">Qual é o banco do cartão?</p>
         <div class="bank-pick">${Object.entries(BANKS).filter(([k]) => k !== 'cash').map(([k, b]) => `<button type="button" data-bank="${k}"><span class="bank-logo" style="background:${b.color}">${b.short}</span>${b.name}</button>`).join('')}<button type="button" data-bank="other"><span class="bank-logo" style="background:#5B6B66">+</span>Outro banco</button></div>`;
-      box.querySelectorAll('[data-bank]').forEach((b) => b.addEventListener('click', () => formStep(b.dataset.bank)));
+      box.querySelectorAll('[data-bank]').forEach((b) => b.addEventListener('click', () => howStep(b.dataset.bank)));
+    };
+    const howStep = (bank) => {
+      const b = BANKS[bank];
+      box.innerHTML = `<button type="button" class="link cw-back" id="cwBack">Trocar de banco</button>
+        <div class="cw-head">${b ? `<span class="bank-logo" style="background:${b.color}">${b.short}</span><b>${b.name}</b>` : '<b>Outro banco</b>'}</div>
+        <p class="cw-q">Como quer trazer os gastos deste cartão?</p>
+        <div class="cw-opts">
+          <button type="button" id="cwConnect" class="cw-rec"><span class="tag tag-live">Recomendado</span><b>Conectar pelo Open Finance</b><span>Autorize no app do banco e o Finaxis puxa sozinho as compras do cartão, a fatura, o limite e também o Pix e o débito da conta. Novos gastos chegam automaticamente.</span></button>
+          <button type="button" id="cwManual"><b>Cadastrar manualmente</b><span>Informe limite e vencimento e lance as compras você mesmo ou importe a fatura em OFX/CSV.</span></button>
+        </div>
+        <p class="cw-safe">A conexão é só de leitura, feita pelo Open Finance regulado pelo Banco Central. O Finaxis nunca vê sua senha nem o número completo do cartão, e você pode revogar quando quiser.</p>`;
+      $('#cwBack', box).addEventListener('click', bankStep);
+      $('#cwConnect', box).addEventListener('click', () => {
+        if (API.online && API.cfg && API.cfg.provider === 'pluggy') { closeModal(); meuPluggyGuide(); }
+        else connectBankModal(BANKS[bank] ? bank : null);
+      });
+      $('#cwManual', box).addEventListener('click', () => formStep(bank));
     };
     const formStep = (bank) => {
       const b = BANKS[bank];
-      box.innerHTML = `<button type="button" class="link cw-back" id="cwBack">Trocar de banco</button>
+      box.innerHTML = `<button type="button" class="link cw-back" id="cwBack">Voltar</button>
         <div class="cw-head">${b ? `<span class="bank-logo" style="background:${b.color}">${b.short}</span><b>${b.name}</b>` : '<b>Outro banco</b>'}</div>
         <div class="form-grid">
           ${b ? '' : '<div class="field full"><label for="cwBankName">Nome do banco</label><input class="input" id="cwBankName" maxlength="40" placeholder="Ex.: Banco Pan"></div>'}
@@ -1465,7 +1485,7 @@
         <p class="cw-safe">O Finaxis nunca pede o número completo, a senha ou o código de segurança do cartão. Os 4 últimos dígitos servem só para você reconhecer qual é.</p>
         <p class="auth-err" id="cwErr" role="alert"></p>
         <div class="cw-foot"><button class="btn btn-sm" data-close>Cancelar</button><button class="btn btn-lime" id="cwSave">Adicionar cartão</button></div>`;
-      $('#cwBack', box).addEventListener('click', bankStep);
+      $('#cwBack', box).addEventListener('click', () => howStep(bank));
       $('#cwName', box).focus();
       $('#cwSave', box).addEventListener('click', () => {
         const name = $('#cwName', box).value.trim(), other = $('#cwBankName', box);
@@ -1547,8 +1567,8 @@
     ['Posto Ipiranga', -180, 'debito'], ['Starbucks', -27.5, 'credito'], ['Shopee', -64.3, 'credito'], ['Cinemark', -58, 'credito'],
     ['Hortifruti Natural', -72.4, 'debito'], ['Rappi *Açaí', -32.9, 'credito'], ['Padaria Real', -18.4, 'pix'], ['Pix recebido — Bia', 45, 'pix'],
   ];
-  function connectBankModal() {
-    let step = 0, bankId = null;
+  function connectBankModal(preBank = null) {
+    let step = preBank ? 1 : 0, bankId = preBank;
     const m = openModal({ title: 'Conectar via <span class="serif">Open Finance</span>', wide: true, body: '<div id="ofBody"></div>' });
     const box = $('#ofBody', m);
     const steps = () => `<div class="steps">${[0, 1, 2, 3].map((i) => `<i class="${i <= step ? 'on' : ''}"></i>`).join('')}</div>`;
